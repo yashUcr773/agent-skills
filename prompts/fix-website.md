@@ -1,0 +1,753 @@
+1. General UI / visual QA
+- remove unnecessary horizontal scroll
+- remove accidental vertical overflow
+- check layout at 320px width
+- check layout at 375px / 390px / 430px
+- check tablet layouts
+- check large desktop / ultrawide layouts
+- fix elements overlapping each other
+- fix clipped text
+- fix overflowing text
+- fix broken grids
+- fix inconsistent spacing
+- fix inconsistent border radius
+- fix inconsistent shadows
+- fix inconsistent button styles
+- fix inconsistent typography
+- fix inconsistent font weights
+- fix inconsistent line heights
+- fix incorrect text alignment
+- check long titles / long names
+- check very short content
+- check empty content
+- check cards with different content lengths
+- ensure images preserve aspect ratio
+- prevent image stretching
+- check sticky headers
+- check fixed elements on mobile
+- check modals don't overflow viewport
+- check dropdown positioning
+- check tooltips positioning
+- check z-index conflicts
+- remove accidental scrollbars inside components
+- check dark mode if supported
+- check browser zoom at 125%, 150%, 200%
+- check OS font scaling
+- check landscape mobile mode
+2. Navigation
+- find and fix broken links
+- remove unused navigation
+- add mobile menu
+- make logo clickable to homepage
+- highlight active navigation item
+- ensure nav works without JavaScript where appropriate
+- add keyboard support for dropdown menus
+- add Escape-to-close for menus/modals
+- close mobile menu after navigation
+- prevent background scrolling when menu is open
+- check anchors / hash links
+- check external links
+- check links opening in new tab
+- add rel="noopener noreferrer" where applicable
+- avoid links that point to #
+- avoid buttons being used as fake links
+- avoid links being used as fake buttons
+- add breadcrumbs where useful
+- make back navigation predictable
+3. Buttons / interactions
+- find and fix broken buttons
+- remove buttons with no action
+- disable buttons while requests are submitting
+- prevent double submissions
+- add hover states
+- add active/pressed states
+- add focus states
+- add disabled states
+- add loading states
+- add loading spinners where appropriate
+- add success messages
+- add error messages
+- add warning messages
+- add confirmation dialogs for destructive actions
+- add undo for destructive actions where practical
+- add toasts
+- ensure toasts don't cover important UI
+- auto-dismiss non-critical toasts
+- keep important errors persistent
+- verify copy-to-clipboard actions
+- provide feedback after copying
+- verify share buttons
+- verify download buttons
+- ensure disabled buttons explain why when unclear
+4. Forms
+- add form error states
+- add form success states
+- validate client-side
+- validate server-side
+- sanitize submitted data
+- add required field indicators
+- use correct input types
+- use autocomplete
+- add proper labels
+- connect labels using for / id
+- add helpful placeholder text only when useful
+- don't use placeholder as the only label
+- remove placeholder/demo values
+- add inline validation
+- don't clear form data after a failed submission
+- focus the first invalid field
+- scroll invalid fields into view
+- add accessible error descriptions
+- handle extremely long input
+- add character limits where appropriate
+- show character count where useful
+- prevent accidental duplicate submissions
+- add success confirmation after submission
+- verify email validation
+- verify phone validation
+- verify URL validation
+- verify date inputs
+- verify file uploads
+- validate file type
+- validate file size
+- show upload progress
+- handle failed uploads
+- handle network failures during submit
+- test autofill
+- test password managers
+- add CAPTCHA / anti-spam only where necessary
+- add honeypot / rate limiting for public forms
+5. Empty / loading / error states
+- add loading skeletons
+- add loading states
+- add empty states
+- add zero-search-results state
+- add offline state where appropriate
+- add network error state
+- add permission-denied state
+- add expired-session state
+- add rate-limit state
+- add server-error state
+- add retry buttons
+- add custom 404 page
+- add custom 403 page if applicable
+- add custom 401 page if applicable
+- add custom 500 page
+- add maintenance page
+- make error pages useful instead of decorative
+- include navigation/home CTA on error pages
+- ensure error messages are understandable to normal users
+- don't expose stack traces to users
+- don't expose database errors to users
+6. Content cleanup
+- remove placeholder text
+- remove lorem ipsum
+- remove fake testimonials
+- remove sample reviews
+- remove fake customer logos
+- remove unused sections
+- remove duplicate sections
+- remove outdated copy
+- remove contradictory copy
+- fix spelling
+- fix grammar
+- fix inconsistent capitalization
+- fix inconsistent punctuation
+- standardize dates
+- standardize currency formatting
+- standardize phone formatting
+- verify addresses
+- verify contact information
+- verify pricing
+- verify plan names
+- verify feature claims
+- verify numbers/statistics
+- verify CTA text
+- make CTAs specific
+- avoid generic "Click Here"
+- ensure each page has an obvious next action
+- check copyright year
+- avoid unnecessarily AI-sounding filler copy
+7. Footer
+- fix footer layout
+- fix footer links
+- remove dead footer links
+- make contact information clickable
+- add current copyright year
+- add company name
+- add privacy policy
+- add terms page
+- add cookie policy where applicable
+- add accessibility statement where appropriate
+- add social links
+- verify social links
+- add contact link
+- add legal/company registration info where required
+- make footer responsive
+8. Images / media
+- compress images
+- use WebP / AVIF where appropriate
+- add responsive srcset
+- avoid serving massive desktop images to mobile
+- resize images to rendered dimensions
+- add lazy loading below the fold
+- don't lazy-load the primary LCP image
+- preload critical hero image where appropriate
+- specify image width and height
+- prevent cumulative layout shift
+- add missing alt text
+- use empty alt text for decorative images
+- avoid stuffing alt text with keywords
+- check broken image URLs
+- add fallback images where useful
+- optimize SVGs
+- remove unused SVG metadata
+- compress videos
+- use poster images for video
+- don't autoplay video with sound
+- lazy-load embeds
+- lazy-load YouTube/maps where appropriate
+9. Branding
+- add favicon
+- add proper logo
+- add dark/light logo variants if required
+- add Apple touch icon
+- add web app icons
+- check favicon at small sizes
+- add correct social sharing image
+- add og:image
+- add Twitter/X card image
+- ensure branding is consistent across pages
+- verify brand colors
+- verify brand fonts
+- avoid missing-font flashes where possible
+10. SEO
+- unique page title per page
+- unique meta description per page
+- add canonical URLs
+- add semantic HTML
+- correct heading hierarchy
+- exactly one meaningful primary H1 in normal page layouts
+- avoid skipping heading levels unnecessarily
+- fix pages with no headings
+- add descriptive anchor text
+- add internal links
+- fix orphan pages
+- remove accidental duplicate pages
+- handle trailing-slash consistency
+- handle www/non-www consistency
+- HTTP → HTTPS redirects
+- redirect old URLs properly
+- avoid redirect chains
+- remove redirect loops
+- add XML sitemap
+- keep sitemap updated
+- add robots.txt
+- prevent staging/dev URLs being indexed
+- remove accidental noindex
+- remove accidental nofollow
+- check canonical vs sitemap conflicts
+- add structured data where relevant
+- validate structured data
+- add Organization schema
+- add LocalBusiness schema if appropriate
+- add Product schema if appropriate
+- add Article schema if appropriate
+- add Breadcrumb schema if appropriate
+- add FAQ schema only when appropriate
+- use semantic <header>, <main>, <nav>, <section>, <article>, <footer>
+- add lang attribute
+- use correct language codes
+- add hreflang for multilingual sites where appropriate
+- add Open Graph metadata
+- add Twitter/X metadata
+- test share previews
+- ensure important content is present in rendered HTML
+- ensure crawlers aren't dependent on user interaction to reveal critical content
+11. AI / LLM discoverability
+- ensure AI crawlers aren't accidentally blocked where you want them allowed
+- review crawler directives individually rather than blindly allowing everything
+- add llms.txt where it fits your publishing strategy
+- keep llms.txt accurate
+- include clear company/about information
+- include clear author information where relevant
+- use descriptive headings
+- use semantic content structure
+- use structured data
+- keep primary content in HTML rather than canvas/images
+- provide clean internal linking
+- make FAQs directly answer questions
+- expose documentation pages to crawlers if intended
+- verify robots rules don't conflict with intended AI access
+- don't expose private/admin/API routes just for AI crawlability
+12. Accessibility
+- test keyboard-only navigation
+- ensure every interactive element is focusable
+- fix keyboard traps
+- add visible focus indicators
+- add skip-to-content link
+- verify color contrast
+- don't communicate information using color alone
+- add accessible names to icon-only buttons
+- add ARIA only when native HTML isn't sufficient
+- remove incorrect ARIA
+- add proper modal semantics
+- trap focus inside active modal
+- restore focus after closing modal
+- ensure screen readers announce form errors
+- ensure toasts can be announced appropriately
+- verify headings make sense to screen readers
+- verify table headers
+- add captions/transcripts for important video/audio
+- support reduced-motion preferences
+- avoid flashing content
+- ensure touch targets are large enough
+- test at 200% zoom
+- avoid hover-only functionality
+- make carousel controls accessible
+- respect logical tab order
+13. Mobile UX
+- fix mobile view
+- fix mobile overflow
+- make all pages mobile optimized
+- add mobile breakpoints
+- avoid tiny text
+- avoid tiny touch targets
+- avoid horizontally scrolling forms
+- avoid fixed-width containers
+- account for mobile safe areas
+- account for browser address bars
+- use 100dvh where appropriate rather than blindly using 100vh
+- prevent iOS input zoom where appropriate
+- test mobile keyboards
+- ensure inputs remain visible when keyboard opens
+- check sticky CTA bars
+- test mobile modals
+- test mobile tables
+- make wide tables scroll gracefully
+- verify tap interactions
+- avoid hover-dependent UI
+14. Performance
+- reduce bundle size
+- remove unused JavaScript
+- remove dead code
+- remove unused CSS
+- remove unused dependencies
+- code split
+- route split
+- lazy-load non-critical components
+- defer non-critical scripts
+- async third-party scripts where appropriate
+- preload critical assets
+- preconnect to critical origins where beneficial
+- optimize fonts
+- subset fonts
+- limit font weights
+- self-host fonts where beneficial
+- cache static assets
+- use hashed asset filenames
+- configure CDN
+- enable Brotli/Gzip
+- compress API payloads
+- paginate large responses
+- use cursor pagination when appropriate
+- avoid overfetching API fields
+- debounce expensive input handlers
+- throttle scroll/resize handlers
+- reduce unnecessary re-renders
+- memoize only where beneficial
+- virtualize very long lists
+- avoid expensive work on main thread
+- use workers for expensive processing where justified
+- eliminate render-blocking resources
+- remove unnecessary third-party trackers
+- check LCP
+- check CLS
+- check INP
+- run Lighthouse
+- test on slow 4G
+- test with CPU throttling
+- test cold cache and warm cache
+15. Backend / API
+- add DB indexes where appropriate
+- inspect slow database queries
+- avoid N+1 queries
+- add database connection pooling
+- cache repeated expensive queries
+- set cache expiration properly
+- invalidate caches correctly
+- paginate large DB queries
+- limit API response sizes
+- compress API responses
+- return proper HTTP status codes
+- use consistent API error format
+- validate request payloads
+- sanitize inputs
+- limit upload sizes
+- set request timeouts
+- add retries only where safe
+- use exponential backoff where appropriate
+- make writes idempotent where necessary
+- avoid leaking internal errors
+- version APIs where appropriate
+- implement rate limits
+- protect expensive endpoints
+- test concurrent requests
+- avoid race conditions
+- use transactions where appropriate
+- check connection leaks
+- check memory leaks
+16. Security
+- force HTTPS
+- enable HSTS where appropriate
+- set secure cookies
+- use HttpOnly cookies where appropriate
+- use SameSite
+- protect against CSRF
+- prevent XSS
+- prevent SQL injection
+- prevent command injection
+- validate and sanitize file uploads
+- block executable uploads
+- protect against path traversal
+- add Content Security Policy
+- add X-Content-Type-Options
+- configure frame/embed protections
+- configure Referrer Policy
+- don't expose secrets in frontend code
+- don't expose .env
+- remove API keys from bundles
+- rotate leaked credentials
+- don't commit secrets
+- restrict API keys by domain/IP where supported
+- secure admin routes
+- require authentication server-side
+- enforce authorization server-side
+- don't rely on hidden UI for permissions
+- test IDOR/access-control issues
+- rate-limit login
+- rate-limit password reset
+- use secure password reset tokens
+- expire reset links
+- add MFA where appropriate
+- invalidate sessions after password/security changes
+- scan dependencies for vulnerabilities
+- update vulnerable packages
+- remove unused packages
+- hide unnecessary server/version headers
+17. Authentication
+- test signup
+- test login
+- test logout
+- test incorrect credentials
+- test password reset
+- test password change
+- test email verification
+- test expired verification links
+- test duplicate email signup
+- test session expiration
+- test refresh tokens
+- test protected routes
+- test role-based access
+- verify redirect after login
+- verify redirect after logout
+- preserve intended destination after login where appropriate
+- prevent open redirects
+- prevent account enumeration
+18. Payments / ecommerce if applicable
+- test successful payment
+- test failed payment
+- test cancelled payment
+- test duplicate payment
+- test abandoned checkout
+- test expired session
+- verify prices server-side
+- don't trust client-calculated totals
+- verify discounts server-side
+- verify tax
+- verify shipping
+- test refunds
+- test subscription cancellation
+- test webhook signatures
+- make webhook processing idempotent
+- handle delayed webhooks
+- handle duplicate webhooks
+- ensure confirmation pages cannot fake successful payment
+- send receipts
+- test out-of-stock cases
+- prevent overselling where applicable
+19. Browser compatibility
+- test Chrome
+- test Safari
+- test Firefox
+- test Edge
+- test iOS Safari
+- test Android Chrome
+- check CSS feature support
+- add fallbacks where necessary
+- verify date inputs across browsers
+- verify file uploads across browsers
+- verify sticky/fixed elements
+- verify viewport units
+- verify custom fonts
+- verify animations
+- verify clipboard APIs
+- verify sharing APIs
+20. URLs / routing
+- manually load every route
+- refresh every SPA route
+- verify direct deep-linking
+- ensure server doesn't 404 valid frontend routes
+- normalize URLs
+- use readable URLs
+- avoid IDs where slugs are appropriate
+- URL-encode parameters safely
+- handle malformed query parameters
+- remove unused URL parameters
+- ensure filter/search URLs can be shared where appropriate
+- preserve navigation state appropriately
+- handle deleted resource URLs
+- redirect renamed pages
+21. Analytics / tracking
+- add analytics only if needed
+- ensure analytics actually fires
+- avoid duplicate events
+- avoid duplicate page views
+- track core conversions
+- track CTA clicks where useful
+- track form completion
+- track form errors if useful
+- exclude internal/dev traffic where practical
+- verify campaign parameters
+- preserve UTM parameters where required
+- respect consent choices
+- don't fire non-essential tracking before consent where legally required
+- don't send sensitive data to analytics
+- remove debug analytics
+22. Privacy / legal
+- add privacy policy
+- add terms
+- add cookie policy if necessary
+- add cookie consent banner where legally required
+- let users reject non-essential cookies where required
+- don't use fake consent banners that don't actually disable trackers
+- provide consent preference controls
+- store consent state
+- provide data deletion/contact mechanism where required
+- disclose third-party processors where applicable
+- verify forms link to relevant privacy information
+- ensure legal/company information is accurate
+- avoid copying policies from unrelated businesses
+- review jurisdiction-specific requirements
+23. Email / contact
+- make email clickable with mailto:
+- make phone clickable with tel:
+- verify contact form delivery
+- verify Reply-To address
+- verify sender domain
+- configure SPF
+- configure DKIM
+- configure DMARC
+- avoid exposing private email addresses unnecessarily
+- test transactional emails
+- test emails on mobile
+- ensure email links work
+- add unsubscribe where required
+- ensure reset/verification email links expire appropriately
+24. Deployment / infrastructure
+- separate development/staging/production environments
+- don't expose staging publicly unless intended
+- password-protect staging
+- disable indexing on staging
+- configure environment variables correctly
+- check production API URLs
+- remove localhost URLs
+- remove debug mode
+- remove console spam
+- remove source maps from public production if they expose sensitive implementation details
+- keep source maps privately available for error monitoring if useful
+- configure caching headers
+- configure CDN
+- configure health checks
+- add load balancer if traffic/architecture actually warrants it
+- configure autoscaling if appropriate
+- configure graceful shutdown
+- configure deployment rollback
+- test rollback process
+- use zero-downtime deploys where necessary
+- ensure migrations are safe
+- back up database
+- test database restore
+- set retention policies
+- monitor disk/storage usage
+25. Observability
+- add error tracking
+- add server logs
+- use structured logs
+- don't log passwords/tokens/sensitive data
+- monitor API errors
+- monitor frontend errors
+- monitor uptime
+- monitor latency
+- monitor database performance
+- monitor queue failures
+- monitor failed jobs
+- monitor payment webhook failures
+- add alerts for critical failures
+- include request/correlation IDs where useful
+- keep logs searchable
+- configure log retention
+26. PWA / installability if applicable
+- add web manifest
+- add app icons
+- set theme color
+- set background color
+- configure service worker
+- handle service-worker updates
+- prevent stale app versions
+- add offline fallback where useful
+- verify install experience
+- don't add a service worker just because Lighthouse suggests one
+27. Search
+- search should tolerate empty input
+- trim whitespace
+- debounce search requests
+- cancel stale requests
+- display loading state
+- display no-results state
+- display error state
+- highlight matches where useful
+- preserve query in URL where useful
+- support keyboard search interaction
+- handle special characters
+- prevent injection
+- paginate results
+- avoid submitting on every keystroke when unnecessary
+28. State management
+- prevent stale UI state
+- avoid duplicated state
+- ensure refresh doesn't unexpectedly destroy essential state
+- persist settings where appropriate
+- clear sensitive state on logout
+- handle multiple tabs
+- handle expired sessions
+- handle optimistic update failures
+- roll back failed optimistic updates
+- avoid race conditions
+- cancel stale requests when components unmount
+29. Code quality
+- remove dead code
+- remove unused code
+- remove unused imports
+- remove unused dependencies
+- remove commented-out code
+- remove old experimental components
+- remove debug logs
+- remove TODOs that should have been resolved
+- fix TypeScript errors
+- fix linter errors
+- fix build warnings
+- avoid excessive any
+- avoid duplicated components
+- extract repeated logic where useful
+- keep components manageable
+- use consistent naming
+- centralize constants
+- centralize configuration
+- avoid hard-coded domains
+- avoid hard-coded secrets
+- avoid hard-coded environment-specific values
+- add error boundaries where appropriate
+30. Testing
+- smoke-test every page
+- test every CTA
+- test every form
+- test every navigation item
+- test happy paths
+- test failure paths
+- test empty states
+- test unauthorized states
+- test expired-session states
+- test slow connections
+- test offline behavior where applicable
+- test invalid user input
+- test extremely long user input
+- test special characters
+- test emojis
+- test multiple languages if supported
+- add unit tests for important logic
+- add integration tests for important flows
+- add end-to-end tests for critical flows
+- test production build, not only dev mode
+31. Things vibe-coded sites commonly leak
+These are especially worth checking because AI-generated projects often accidentally leave them behind:
+- demo API keys
+- placeholder Stripe keys
+- Supabase service keys
+- Firebase config misunderstandings
+- hardcoded admin emails
+- localhost:3000
+- example domains
+- example@email.com
+- placeholder phone numbers
+- TODO comments
+- generated fake testimonials
+- fake statistics
+- nonfunctional social links
+- empty buttons
+- buttons that only console.log()
+- fake search
+- fake login
+- fake checkout
+- fake newsletter forms
+- mock API data still used in production
+- hardcoded arrays instead of DB data
+- sample avatars
+- Unsplash hotlinks
+- broken remote image domains
+- debug panels
+- dev-only routes
+- admin pages accessible without authorization
+- secrets exposed through NEXT_PUBLIC_* / public env vars
+- APIs trusting user IDs passed from the browser
+- frontend-only authorization checks
+- missing database Row Level Security where the stack relies on it
+- permissive CORS
+- wildcard redirect URLs
+- wildcard OAuth callback URLs
+32. Final pre-launch checks
+- production build succeeds with zero critical errors
+- visit every public URL
+- click every major link
+- submit every form
+- test login/logout
+- test primary conversion flow
+- test 404
+- test 500/error handling
+- test mobile
+- test Safari
+- run Lighthouse
+- run accessibility audit
+- run broken-link checker
+- run security headers check
+- scan dependencies
+- validate sitemap
+- validate robots.txt
+- validate structured data
+- test social share preview
+- test favicon
+- verify analytics
+- verify emails
+- verify backups
+- verify SSL certificate
+- verify DNS
+- verify redirects
+- check browser console for errors
+- check network tab for failed requests
+- check production server logs
+- check that staging isn't indexed
+- check that private/admin pages aren't indexed
+- check that no secrets appear in frontend bundles
+- check that no placeholder/demo content remains
+One thing I'd change in your original list: “add load balancer,” “add CDN,” “add DB indexes,” “add connection pools,” etc. shouldn't automatically be fixes. They should be “check whether X is needed.” Vibe-coded projects can become worse when infrastructure is added without an actual bottleneck. Same principle for memoization, caching, pagination, service workers, code splitting, and lazy loading: measure first, then apply where useful.
+You could turn this into a 300–500 point website audit checklist with columns for Issue, How to check, Pass criteria, Severity, Auto-fixable, and AI prompt to fix it. That would be particularly useful if your goal is to feed a standardized audit into Cursor/Claude Code/Codex and systematically clean up vibe-coded projects.
