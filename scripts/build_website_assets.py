@@ -15,6 +15,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MASTER = ROOT / "improve-website"
 REFERENCES = MASTER / "references"
+FIX_WEBSITE_PROMPT = ROOT / "prompts" / "fix-website.md"
+REVIEW_CHANGES_PROMPT = ROOT / "prompts" / "review-changes.md"
 
 # name suffix, title, source reference, finding prefix, discovery description
 DOMAINS = (
@@ -141,6 +143,45 @@ def generate():
         + nest_headings(workflow) + "\n\n" + coordination.strip() + "\n\n"
         + "\n\n".join(sections) + "\n"
     )
+
+    checklist = FIX_WEBSITE_PROMPT.read_text(encoding="utf-8").strip()
+    files["fix-website/references/workflow.md"] = workflow + "\n"
+    files["fix-website/references/checklist.md"] = checklist + "\n"
+    files["fix-website/SKILL.md"] = """---
+name: fix-website
+description: Audit and improve an existing website with an unabridged, general website checklist. Use when the complete checklist is wanted in one installable skill; default to user review before fixes unless audit-and-fix is explicitly requested.
+---
+
+# Fix Website
+
+This skill is self-contained, framework agnostic, and agent agnostic. Use it for broad website audit and improvement work. It includes the original unabridged checklist and does not require the focused website skills.
+
+Read [references/workflow.md](references/workflow.md) first. It defines the default **audit → user review → selected fixes → verification** workflow, the explicit **audit-and-fix** option, audit-only operation, and the evidence/verification standard.
+
+Then read [references/checklist.md](references/checklist.md) and select the areas that apply to the site's actual features, routes, users, and agreed scope. The checklist directs what to investigate; it does not require adding every item. Treat optional features and infrastructure as proposals that need a demonstrated need and any relevant product decision.
+
+Establish the critical journeys, public/private boundaries, authoritative business content, safe test environment, and available access before auditing. Ask targeted questions when answers materially affect intended behavior, branding, pricing, legal/privacy choices, crawler policy, or live-service actions. Do not invent missing answers.
+
+For each actionable finding, record a stable ID, severity, confidence, affected location, evidence, impact, proposed change, decision/open question, and observable pass criteria. Separate confirmed defects, optional improvements, questions, and checks not verified or not applicable. Do not expose secrets or personal data in findings.
+
+In review-first mode, present prioritized findings and proposed changes, then wait for the user's selected scope before editing. In audit-and-fix mode, make unambiguous in-scope corrections and verify them, pausing only when a material decision or specific live-system authority is needed. Do not deploy, send real messages, make payments, rotate credentials, alter DNS, or execute production data operations unless separately authorized.
+
+After accepted work, reproduce the original issue, verify each pass criterion, and exercise affected adjacent behavior. Report changes, checks actually run, remaining risks, deferred items, and verification limits. Do not treat a checklist, successful build, or a single scan as proof of complete security, accessibility, performance, or compliance.
+"""
+
+    review_prompt = REVIEW_CHANGES_PROMPT.read_text(encoding="utf-8").strip()
+    review_heading = "# Review Changes — reusable prompt\n\n"
+    if not review_prompt.startswith(review_heading):
+        raise ValueError("Review Changes prompt is missing its expected title")
+    files["review-changes/SKILL.md"] = (
+        "---\n"
+        "name: review-changes\n"
+        "description: Review current changes, staged changes, commits, branches, or pull requests for correctness, security, accessibility, performance, and other applicable regressions. Default to review only; use when the change set and comparison baseline matter.\n"
+        "---\n\n"
+        "# Review Changes\n\n"
+        "This installable skill packages the standalone review prompt. It is framework and agent agnostic, and defaults to review only.\n\n"
+        + review_prompt.removeprefix(review_heading) + "\n"
+    )
     return files
 
 
@@ -151,7 +192,7 @@ def main():
     mode.add_argument("--write", action="store_true", help="Regenerate only the known output files")
     mode.add_argument("--json", action="store_true", help="Print the generated path-to-content map")
     parser.add_argument(
-        "--skill", choices=["improve-website"] + [f"website-{item[0]}" for item in DOMAINS],
+        "--skill", choices=["improve-website", "fix-website", "review-changes"] + [f"website-{item[0]}" for item in DOMAINS],
         help="Limit output to one skill's generated files",
     )
     args = parser.parse_args()

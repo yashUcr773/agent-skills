@@ -1,13 +1,14 @@
 # Agent Skills
 
-Reusable, framework-agnostic and agent-agnostic workflows for maintaining repositories and improving websites. This repository contains **12 independently installable skills**, each with a matching standalone prompt, plus a standalone change-review prompt.
+Reusable, framework-agnostic and agent-agnostic workflows for maintaining repositories and improving websites. This repository contains **14 independently installable skills**, each with a matching standalone prompt.
 
 ## Which skill should I use?
 
 - Use **`modernize-old-repo`** when reviving an old or neglected repository: setup, dependencies, architecture, maintenance, and project health are the starting point. It also applies to projects that are not websites.
 - Use **`improve-website`** when assessing a whole website, preparing for launch, or investigating problems across several areas. It coordinates one combined audit and review.
+- Use **`fix-website`** when you want the original unabridged general website checklist in one standalone installable skill.
 - Use a **focused `website-*` skill** when you already know the problem area and want a narrower audit or fix.
-- Use the **[review-changes prompt](prompts/review-changes.md)** when reviewing uncommitted changes, staged changes, a commit, a branch, or a PR for regressions across security, accessibility, performance, correctness, and other affected areas.
+- Use **`review-changes`** when reviewing uncommitted changes, staged changes, a commit, a branch, or a PR for regressions across security, accessibility, performance, correctness, and other affected areas.
 
 ### Skill catalog
 
@@ -15,6 +16,7 @@ Reusable, framework-agnostic and agent-agnostic workflows for maintaining reposi
 | --- | --- | --- |
 | [modernize-old-repo](modernize-old-repo/SKILL.md) | A stale repository may no longer install, run, or build; dependencies, code, tests, and documentation need a maintenance audit before incremental improvements. | [Prompt](prompts/modernize-old-repo.md) |
 | [improve-website](improve-website/SKILL.md) | You need a whole-site assessment, a prioritized improvement plan, or final pre-launch checks spanning multiple domains. | [Prompt](prompts/improve-website.md) |
+| [fix-website](fix-website/SKILL.md) | You want a broad website audit using the original complete checklist in one installable skill. | [Prompt](prompts/fix-website.md) |
 | [website-ui-accessibility](website-ui-accessibility/SKILL.md) | Pages overflow or overlap, mobile layouts break, styling is inconsistent, or keyboard, screen-reader, zoom, and browser behavior need review. | [Prompt](prompts/website-ui-accessibility.md) |
 | [website-interactions](website-interactions/SKILL.md) | Links, menus, buttons, forms, deep links, or search fail; loading/error feedback is missing; client state becomes stale or inconsistent. | [Prompt](prompts/website-interactions.md) |
 | [website-content-branding](website-content-branding/SKILL.md) | The site contains placeholder or unsupported copy, inconsistent branding, missing icons, unclear CTAs, or incorrect footer/contact details. | [Prompt](prompts/website-content-branding.md) |
@@ -25,6 +27,7 @@ Reusable, framework-agnostic and agent-agnostic workflows for maintaining reposi
 | [website-commerce](website-commerce/SKILL.md) | Checkout, prices, orders, inventory, subscriptions, refunds, or payment webhooks need validation in a safe test environment. | [Prompt](prompts/website-commerce.md) |
 | [website-privacy-analytics](website-privacy-analytics/SKILL.md) | Tracking events are missing/duplicated, consent choices do not control trackers, sensitive data reaches analytics, or policies do not match actual practices. | [Prompt](prompts/website-privacy-analytics.md) |
 | [website-operations](website-operations/SKILL.md) | Deployment, environment configuration, backups, recovery, monitoring, DNS/TLS, contact delivery, or transactional email needs operational review. | [Prompt](prompts/website-operations.md) |
+| [review-changes](review-changes/SKILL.md) | You need an evidence-based review of current/staged changes, a commit, a branch, or a PR before fixing or merging it. | [Prompt](prompts/review-changes.md) |
 
 ### Common website feature checks
 
@@ -39,11 +42,11 @@ These features are covered where relevant. Existing controls are checked for def
 
 The master includes these checks, and [Review Changes](prompts/review-changes.md) examines them when affected by a change. Related performance, security, and SEO checklists cover animation cost, password exposure, and accurate modification dates.
 
-### Additional standalone prompt
+### Change-review skill
 
-[Review Changes](prompts/review-changes.md) provides a comprehensive review of a specific change set. It establishes the comparison baseline, traces effects beyond the diff, and reports prioritized findings with evidence, locations, proposed corrections, and verification gaps. It distinguishes introduced regressions from pre-existing issues and covers security, privacy, accessibility, UI/browser behavior, performance, APIs/data integrity, integrations, SEO, operations, tests, and maintainability where applicable.
+[review-changes](review-changes/SKILL.md) provides a comprehensive review of a specific change set. It establishes the comparison baseline, traces effects beyond the diff, and reports prioritized findings with evidence, locations, proposed corrections, and verification gaps. It distinguishes introduced regressions from pre-existing issues and covers security, privacy, accessibility, UI/browser behavior, performance, APIs/data integrity, integrations, SEO, operations, tests, and maintainability where applicable.
 
-Copy the prompt into your agent and specify the target. It requires no skill installation and defaults to review only. Fixes follow your selected findings, or an explicit request to review and fix. This prompt is maintained directly and is separate from the generated website audit skill/prompt pairs.
+The skill defaults to review only. Fixes follow your selected findings, or an explicit request to review and fix. Its matching prompt can still be copied directly into an agent without installation.
 
 ### Master versus focused skills
 
@@ -65,6 +68,8 @@ Choose the command for the skill you want; you do not need to run all three:
 
 ```bash
 npx skills add yashUcr773/agent-skills --skill improve-website
+npx skills add yashUcr773/agent-skills --skill fix-website
+npx skills add yashUcr773/agent-skills --skill review-changes
 npx skills add yashUcr773/agent-skills --skill website-ui-accessibility
 npx skills add yashUcr773/agent-skills --skill modernize-old-repo
 ```
@@ -233,9 +238,9 @@ The agent should provide prioritized findings with stable IDs, affected location
 
 ## Maintaining website workflows
 
-The original [todo checklist](prompts/fix-website.md) is preserved. The maintained sources are [the master skill](improve-website/SKILL.md), [the shared workflow](improve-website/references/workflow.md), and the ten domain checklists linked from the master. [The generator](scripts/build_website_assets.py) holds the focused skill names and discovery descriptions.
+The original [todo checklist](prompts/fix-website.md) and [change-review prompt](prompts/review-changes.md) are preserved. The maintained sources are [the master skill](improve-website/SKILL.md), [the shared workflow](improve-website/references/workflow.md), and the ten domain checklists linked from the master. [The generator](scripts/build_website_assets.py) holds the focused skill names and creates the self-contained `fix-website` and `review-changes` skill copies.
 
-Edit these sources, then regenerate the ten self-contained focused `SKILL.md` files and eleven standalone prompts. Generated copies intentionally repeat the workflow and domain text so each installation or pasted prompt works on its own. Do not edit generated copies directly.
+Edit these sources, then regenerate the self-contained focused skill/prompt copies and the `fix-website`/`review-changes` skills. Generated copies intentionally repeat the workflow and checklist text so each installation or pasted prompt works on its own. Do not edit generated copies directly.
 
 ```bash
 python3 scripts/build_website_assets.py --write
