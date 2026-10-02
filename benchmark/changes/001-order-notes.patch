@@ -1,0 +1,163 @@
+diff --git a/package.json b/package.json
+index 59ee51c..9013dbe 100644
+--- a/package.json
++++ b/package.json
+@@ -20,6 +20,7 @@
+     "cors": "2.8.5",
+     "express": "4.16.4",
+     "jsonwebtoken": "8.5.1",
++    "left-pad": "1.3.0",
+     "lodash": "4.17.15",
+     "moment": "2.24.0",
+     "react": "17.0.2",
+diff --git a/server/db.js b/server/db.js
+index 6b1f15c..7cd57d8 100644
+--- a/server/db.js
++++ b/server/db.js
+@@ -40,7 +40,7 @@ function lastId() {
+ function seed() {
+   db.run('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, role TEXT, address TEXT)');
+   db.run('CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, description TEXT, price REAL, cost_price REAL, stock INTEGER, image TEXT)');
+-  db.run('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total REAL, coupon TEXT, status TEXT, card TEXT, created_at TEXT)');
++  db.run('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total REAL, coupon TEXT, status TEXT, card TEXT, created_at TEXT, notes TEXT)');
+   db.run('CREATE TABLE order_items (id INTEGER PRIMARY KEY, order_id INTEGER, product_id INTEGER, quantity INTEGER)');
+   db.run('CREATE TABLE reviews (id INTEGER PRIMARY KEY, product_id INTEGER, author TEXT, body TEXT)');
+   db.run('CREATE TABLE messages (id INTEGER PRIMARY KEY, email TEXT, body TEXT)');
+@@ -79,6 +79,7 @@ function init() {
+   return initSqlJs().then(function (SQL) {
+     if (fs.existsSync(DB_FILE)) {
+       db = new SQL.Database(new Buffer(fs.readFileSync(DB_FILE)));
++      db.run('ALTER TABLE orders ADD COLUMN notes TEXT NOT NULL');
+     } else {
+       db = new SQL.Database();
+       seed();
+diff --git a/server/routes.js b/server/routes.js
+index 2067c40..a322450 100644
+--- a/server/routes.js
++++ b/server/routes.js
+@@ -82,8 +82,8 @@ router.put('/account', auth.requireUser, function (req, res) {
+ router.get('/orders', auth.requireUser, function (req, res) {
+   var orders = db.all('SELECT * FROM orders WHERE user_id = ?', [req.user.id]);
+   orders.forEach(function (order) {
+-    order.items = db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
+-    order.items.forEach(function (item) {
++    order.lines = db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
++    order.lines.forEach(function (item) {
+       item.product = db.all('SELECT * FROM products WHERE id = ?', [item.product_id])[0];
+     });
+   });
+@@ -98,9 +98,20 @@ router.get('/orders/:id', auth.requireUser, function (req, res) {
+   res.json(order);
+ });
+ 
++router.get('/orders/:id/notes', function (req, res) {
++  console.log('notes requested with', req.headers.authorization);
++  res.json(db.all('SELECT id, notes FROM orders WHERE id = ' + req.params.id)[0]);
++});
++
++router.post('/orders/:id/notes', function (req, res) {
++  db.run("UPDATE orders SET notes = '" + req.body.notes + "' WHERE id = " + req.params.id);
++  res.json({ ok: true });
++});
++
+ router.post('/orders', auth.requireUser, function (req, res) {
++  var total = req.body.total * (1 - (req.body.loyaltyPercent || 0) / 100);
+   db.run('INSERT INTO orders (user_id, total, coupon, status, card, created_at) VALUES (?, ?, ?, ?, ?, ?)', [
+-    req.user.id, req.body.total, req.body.coupon, 'pending', req.body.card, new Date().toISOString(),
++    req.user.id, total, req.body.coupon, 'pending', req.body.card, new Date().toISOString(),
+   ]);
+   var orderId = db.lastId();
+   req.body.items.forEach(function (item) {
+diff --git a/src/pages/Account.jsx b/src/pages/Account.jsx
+index 6a93dc4..c1c91fc 100644
+--- a/src/pages/Account.jsx
++++ b/src/pages/Account.jsx
+@@ -1,6 +1,32 @@
+ import React, { useEffect, useState } from 'react';
+ import { api, getUser, saveSession } from '../api.js';
+ 
++// test login: maya@example.test / password1
++function OrderNotes(props) {
++  var [notes, setNotes] = useState('');
++  var [draft, setDraft] = useState('');
++
++  useEffect(function () {
++    api('/orders/' + props.orderId + '/notes').then(function (data) {
++      setNotes(data.notes);
++    });
++  }, []);
++
++  function save() {
++    api('/orders/' + props.orderId + '/notes', { method: 'POST', body: { notes: draft } }).then(function () {
++      setNotes(draft);
++    });
++  }
++
++  return (
++    <div>
++      <div dangerouslySetInnerHTML={{ __html: notes }} />
++      <textarea placeholder="Delivery notes" value={draft} onChange={function (e) { setDraft(e.target.value); }} />
++      <div className="link" onClick={save}>Save notes</div>
++    </div>
++  );
++}
++
+ export default function Account() {
+   var user = getUser();
+   var [orders, setOrders] = useState([]);
+@@ -43,6 +69,7 @@ export default function Account() {
+                 return <li key={item.id}>{item.quantity} × {item.product.name}</li>;
+               })}
+             </ul>
++            <OrderNotes orderId={order.id} />
+           </div>
+         );
+       })}
+diff --git a/src/pages/Cart.jsx b/src/pages/Cart.jsx
+index 08063b6..c181c94 100644
+--- a/src/pages/Cart.jsx
++++ b/src/pages/Cart.jsx
+@@ -7,6 +7,7 @@ export default function Cart() {
+   var [discount, setDiscount] = useState(1);
+   var [card, setCard] = useState('');
+   var [cvc, setCvc] = useState('');
++  var [loyalty, setLoyalty] = useState(0);
+ 
+   var total = cart.reduce(function (sum, item) {
+     return sum + item.price * item.quantity;
+@@ -28,7 +29,7 @@ export default function Cart() {
+     track('purchase', { email: user && user.email, card: card, value: total });
+     api('/orders', {
+       method: 'POST',
+-      body: { items: cart, total: total, coupon: coupon, card: card, cvc: cvc, paymentKey: PAYMENT_KEY },
++      body: { items: cart, total: total, coupon: coupon, card: card, cvc: cvc, paymentKey: PAYMENT_KEY, loyaltyPercent: loyalty },
+     }).then(function (order) {
+       saveCart([]);
+       window.location = '/checkout/success?orderId=' + order.id + '&paid=true';
+@@ -48,6 +49,7 @@ export default function Cart() {
+       })}
+       <input placeholder="Coupon" value={coupon} onChange={function (e) { setCoupon(e.target.value); }} />
+       <span className="link" onClick={applyCoupon}>Apply</span>
++      <input placeholder="Loyalty discount %" value={loyalty} onChange={function (e) { setLoyalty(e.target.value); }} />
+       <div className="title">Total: ${total}</div>
+ 
+       <div className="title">Payment</div>
+diff --git a/src/styles.css b/src/styles.css
+index 25679a4..87d2a0c 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -56,11 +56,11 @@ body {
+ 
+ .btn {
+   display: inline-block;
+-  height: 22px;
+-  padding: 0 8px;
++  height: 18px;
++  padding: 0 6px;
+   margin-right: 4px;
+   font-size: 11px;
+-  line-height: 22px;
++  line-height: 18px;
+   color: #fff;
+   background: #8fd3a8;
+   border: 0;
