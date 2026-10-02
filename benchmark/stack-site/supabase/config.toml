@@ -1,0 +1,36 @@
+project_id = "fernway-care-club"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[studio]
+enabled = false
+
+[realtime]
+enabled = false
+
+[analytics]
+enabled = false
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://*", "http://localhost:3000/**"]
+jwt_expiry = 604800
+enable_signup = true
+minimum_password_length = 6
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
