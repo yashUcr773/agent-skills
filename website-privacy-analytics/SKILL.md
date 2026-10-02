@@ -1,11 +1,16 @@
 ---
 name: website-privacy-analytics
-description: Audit and improve website tracking accuracy, data minimization, consent behavior, privacy controls, and policy consistency. Review before fixes unless audit-and-fix is explicitly requested; clarify actual business and jurisdiction inputs.
+description: Audit and improve website tracking accuracy, data minimization, consent behavior, third-party embeds and session replay, privacy controls, account deletion, and policy consistency. Review before fixes unless audit-and-fix is explicitly requested; clarify actual business and jurisdiction inputs.
+metadata:
+  version: "1.1.0"
+  prompt-hash: "a1f57ca66298"
 ---
 
 # Website Privacy and Analytics
 
-This skill is self-contained, framework agnostic, and agent agnostic. Default to audit, user review, then selected fixes and verification. Use audit-and-fix only when explicitly requested.
+This skill is self-contained, framework agnostic, and agent agnostic. Default to audit, user review, then selected fixes and verification. Use audit-and-fix or audit only when the user asks for it, and re-audit when they ask to re-check saved findings.
+
+Take the target, goal, scope, mode, depth, and constraints from the conversation. Inspect first, and ask only where a missing answer changes the result.
 
 Use `PRIV-001`, `PRIV-002`, and so on for stable finding IDs. Apply the workflow below only to the requested domain and scope. Other domains mentioned in the checklist are related concerns, not required installed skills.
 
@@ -18,8 +23,19 @@ Use the actual repository, site, and conversation as evidence. The checklist ide
 - **Review first — default:** audit, present findings and proposed fixes, get the user's review, then implement the selected fixes with their corrections and verify them. During the audit, do not change application source, dependency/lock files, configuration, or hosted settings. Non-mutating inspection and existing diagnostic checks with ordinary temporary outputs are appropriate.
 - **Audit and fix — explicit option:** when the user explicitly requests auditing and fixing without an intermediate review, gather evidence and implement unambiguous fixes within the requested scope, then verify and report. This mode does not answer unresolved product questions or authorize unrelated live-system changes.
 - **Audit only — when requested:** report findings and stop. Do not turn an audit request into implementation.
+- **Re-audit — when requested:** when a findings file from an earlier audit exists and the user asks to re-check it, test each recorded finding against the current site and mark it fixed and verified, still open, regressed, or not verified, with the evidence. Do not repeat the whole audit or change application files. Record a new problem met along the way as a new finding.
 
 Use the mode requested in the conversation; no exact invocation phrase is required. Honor earlier review decisions and authorization. Do not ask again for approval already given for the same concrete scope. A later instruction to pause or narrow the task takes precedence.
+
+### Choose the depth
+
+Depth is separate from mode and defaults to standard.
+
+- **Quick:** a time-boxed pass over the critical journeys, shared layouts, and the checks named on each selected checklist's quick-pass line. Report it as a partial audit and list what was skipped.
+- **Standard — default:** the selected checklists across the agreed scope, sampling large sites as described below.
+- **Deep:** every in-scope route and state, repeated measurements, and adversarial or edge-case testing where it applies. Use it when requested or before a high-stakes launch.
+
+A quick pass can still surface a critical finding, but it cannot support a readiness claim.
 
 ### Clarify consequential choices
 
@@ -43,6 +59,34 @@ For each actionable finding record:
 
 Use critical for demonstrated severe exposure or loss, high for major security/reliability failures or blocked core journeys, medium for meaningful degradation, and low for minor defects. Keep preference-driven improvements optional rather than assigning artificial urgency. Do not print credentials, personal data, reset links, or session tokens in reports.
 
+Finding IDs must stay stable across the whole engagement. When the work will continue in a later session, or the user asks, offer to save the findings to `website-audit-findings.md` in a location the user chooses. Writing that file is not an application change, but ask before adding it to the repository, and keep secrets and personal data out of it. When the file already exists, read it first, keep its IDs and decisions, update statuses, and number new findings after the highest existing ID.
+
+Use this layout for the findings file so any later session can read it:
+
+```markdown
+# Website audit findings
+
+- Target: <repository or URL>
+- Last updated: <date>
+- Mode and depth: <mode>, <depth>
+- Scope: <routes, journeys, or areas covered>
+- Not covered: <areas skipped or not verified>
+
+| ID | Severity | Status | Location | Problem | Proposed change | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| SEC-001 | high | open | `server/orders.js` | Any signed-in user can read any order | Check ownership on the server | fix |
+
+## SEC-001
+
+- Confidence: <high / medium / low>
+- Evidence: <redacted reproduction or code path>
+- Impact: <who is affected and how>
+- Pass criteria: <observable result that proves the fix>
+- Verification: <what was re-checked, when, and the result>
+```
+
+Status is one of `open`, `fixed and verified`, `changed but not verified`, `deferred`, `not applicable`, or `regressed`. Decision records the user's choice: `fix`, `defer`, `change`, or `undecided`.
+
 ### Present the review
 
 In review-first mode, give a concise prioritized findings list and an actionable proposed scope before changing application files. Separate confirmed defects from options and questions. Ask the user which finding IDs to fix, defer, or change, and ask any concrete questions needed for that choice. Then pause implementation until their response. This review is the user checkpoint required by this workflow.
@@ -52,6 +96,8 @@ Apply the response as the implementation brief. If the user selects only some fi
 ### Implement within the agreed scope
 
 Use small, coherent changes and existing project conventions. Do not replace frameworks, add major dependencies, delete apparently unused features, introduce infrastructure, or rewrite copy based on guesswork. Check callers and runtime use before removing code or assets. Treat optional additions such as caching, analytics, service workers, CAPTCHAs, load balancers, and new tests as choices driven by a demonstrated need.
+
+Fix one finding at a time. Keep each finding's change separate enough to review and revert on its own, verify it against its pass criteria before starting the next, and update the findings file when one exists. Commit or push only when the user has asked; when they have, make one commit per finding or small related group and name the finding IDs in the message.
 
 Use isolated fixtures, test accounts, sandbox payments, and test email destinations where applicable. Do not send real messages, charge/refund money, rotate live credentials, change DNS, deploy, apply production migrations, or alter retention/data without that action being in the user's authorized scope. Read-only access is not authorization to mutate a live service. Prepare reviewable code/configuration and ask for the specific missing authority only when the next step needs it.
 
@@ -65,9 +111,13 @@ Check the production build when relevant. A screenshot does not prove an interac
 
 Report what changed and why, what was verified and where, what still fails, and what was deferred or needs user input. Keep **fixed and verified**, **changed but not verified**, **unfixed**, and **not applicable** distinct. Describe unavailable browsers, devices, accounts, network conditions, or infrastructure evidence explicitly. Stop when the agreed scope is complete and report any remaining work without implying it was done.
 
+End every report with an **Owner actions** list: the things only the owner can do or confirm. Typical items are DNS and registrar changes, credential rotation, legal and policy sign-off, switching payments to live mode, settings in a hosting or provider dashboard, and product decisions left open. For each, say what to do, where, and why it could not be done or verified here.
+
 ## Privacy, consent, and analytics
 
-Source checklist sections: 21 (analytics/tracking), 22 (privacy/legal).
+Quick pass: Inventory; Consent states; Working controls; Sensitive data; Policy accuracy.
+
+Severity examples: critical — sensitive personal or payment data is sent to third parties or written to logs; high — tracking runs before required consent, or a policy misstates actual practice; medium — unnecessary data collection or missing user controls; low — minor wording gaps in a notice.
 
 ### Establish data practices and goals
 
@@ -77,26 +127,32 @@ Determine whether analytics is needed and which decisions or conversions it shou
 
 ### Consent behavior and tracking controls
 
-- Inventory network requests, scripts, cookies, local storage, server-side collection, and embedded services actually used. Distinguish necessary functionality from optional tracking using real purpose and applicable requirements, not vendor labels alone.
-- Evaluate a simple cookie banner only when actual data practices and applicable requirements call for one. Keep the copy clear, link the relevant policy, and provide usable accept/reject/preferences controls as needed. Support keyboard and touch use, readable contrast, mobile layouts, and reopening preferences without unnecessarily obscuring the site. Simplicity must not reduce consent to a cosmetic dismiss button: wire choices to real script/storage behavior, and do not treat dismissal as consent when consent is required.
-- Check initial load, no choice, accept, reject, granular changes, withdrawal, returning visits, and cross-page navigation. Where prior consent is required, verify optional tracking does not fire before it, including tag managers, pixels, preconnects, and deferred scripts.
-- Verify required rejection and preference controls are usable and that stored choices affect real loading and event behavior. A cosmetic banner that leaves trackers running is a finding; an intentionally tracker-free site may not need a banner.
-- Check consent persistence and expiry/version handling against the applicable policy. Do not fabricate retention periods or assume withdrawal can retroactively erase data already sent to a provider.
-- Avoid bundling consent changes into a silent analytics implementation. Identify dependencies on embeds, ads, personalization, and essential flows before blocking scripts.
+- **Inventory.** Inventory network requests, scripts, cookies, local storage, server-side collection, and embedded services actually used. Distinguish necessary functionality from optional tracking using real purpose and applicable requirements, not vendor labels alone.
+- **Cookie banner.** Evaluate a simple cookie banner only when actual data practices and applicable requirements call for one. Keep the copy clear, link the relevant policy, and provide usable accept/reject/preferences controls as needed. Support keyboard and touch use, readable contrast, mobile layouts, and reopening preferences without unnecessarily obscuring the site. Simplicity must not reduce consent to a cosmetic dismiss button: wire choices to real script/storage behavior, and do not treat dismissal as consent when consent is required.
+- **Consent states.** Check initial load, no choice, accept, reject, granular changes, withdrawal, returning visits, and cross-page navigation. Where prior consent is required, verify optional tracking does not fire before it, including tag managers, pixels, preconnects, and deferred scripts.
+- **Working controls.** Verify required rejection and preference controls are usable and that stored choices affect real loading and event behavior. A cosmetic banner that leaves trackers running is a finding; an intentionally tracker-free site may not need a banner.
+- **Persistence.** Check consent persistence and expiry/version handling against the applicable policy. Do not fabricate retention periods or assume withdrawal can retroactively erase data already sent to a provider.
+- **Dependencies.** Avoid bundling consent changes into a silent analytics implementation. Identify dependencies on embeds, ads, personalization, and essential flows before blocking scripts.
+- **Third-party embeds.** Check whether video, map, font, social, and chat embeds contact third parties on page load before a required choice. Where consent applies, consider click-to-load placeholders or privacy-enhanced modes, and verify in the network log that nothing loads early.
+- **Session replay and heatmaps.** Where recording tools are used, verify that passwords, payment fields, and personal form content are masked or excluded at capture, not just hidden in the dashboard, and that recording follows consent choices.
+- **Browser privacy signals.** Check whether Global Privacy Control or similar signals are honored where the applicable rules or the site's own policy say they are. Do not claim to honor a signal the implementation ignores.
 
 ### Analytics accuracy and minimization
 
-- Verify intended page views and core conversions actually fire, with no duplicates from SPA routing, rerenders, multiple installations, or retry behavior. Define event meaning before adding CTA or form error events.
-- Check campaign/UTM handling and whether approved attribution survives the relevant navigation/conversion flow. Do not persist identifiers indefinitely or append tracking parameters to unrelated links without a defined need.
-- Exclude development/internal traffic where practical and remove debug analytics. Use test properties, debug facilities, or clearly identified synthetic events to avoid polluting production reporting.
-- Inspect URLs, query strings, event names/properties, user IDs, and error payloads for passwords, tokens, payment details, personal form fields, and unnecessary identifiers. Avoid copying sensitive payloads into findings.
-- Validate both sending and observed receipt where access permits. A network request or console message alone does not prove the provider processed the correct event.
+- **Event accuracy.** Verify intended page views and core conversions actually fire, with no duplicates from SPA routing, rerenders, multiple installations, or retry behavior. Define event meaning before adding CTA or form error events.
+- **Attribution.** Check campaign/UTM handling and whether approved attribution survives the relevant navigation/conversion flow. Do not persist identifiers indefinitely or append tracking parameters to unrelated links without a defined need.
+- **Internal traffic.** Exclude development/internal traffic where practical and remove debug analytics. Use test properties, debug facilities, or clearly identified synthetic events to avoid polluting production reporting.
+- **Sensitive data.** Inspect URLs, query strings, event names/properties, user IDs, and error payloads for passwords, tokens, payment details, personal form fields, and unnecessary identifiers. Avoid copying sensitive payloads into findings.
+- **Receipt.** Validate both sending and observed receipt where access permits. A network request or console message alone does not prove the provider processed the correct event.
 
 ### Policies and user controls
 
-- Check relevant privacy, terms, cookie, company/legal, and processor information for accuracy against actual business and data practices. Flag contradictory or unrelated boilerplate and unsupported commitments.
-- Verify links from relevant forms and site surfaces, consent preference access, and applicable contact/data-deletion mechanisms. A link or button must reach a working, appropriate process; do not submit a real deletion request as a test.
-- Prepare factual policy corrections or clearly marked drafts based on supplied information. Obtain the user's decisions for missing practices and jurisdiction-dependent requirements before representing text as final legal policy.
+- **Policy accuracy.** Check relevant privacy, terms, cookie, company/legal, and processor information for accuracy against actual business and data practices. Flag contradictory or unrelated boilerplate and unsupported commitments.
+- **Links and requests.** Verify links from relevant forms and site surfaces, consent preference access, and applicable contact/data-deletion mechanisms. A link or button must reach a working, appropriate process; do not submit a real deletion request as a test.
+- **Drafts.** Prepare factual policy corrections or clearly marked drafts based on supplied information. Obtain the user's decisions for missing practices and jurisdiction-dependent requirements before representing text as final legal policy.
+- **Account deletion.** Where users have accounts, check that they can find and start account deletion or a data request without contacting support when the applicable rules or platform policies require it, and that the outcome matches what the policy says about retained data. Use a test account; do not delete real user data.
+- **Data export.** Where users have accounts and the applicable rules or the site's policy promise it, check that users can obtain a copy of their data in a usable format, and that an export contains only the requesting user's data.
+- **Age restrictions.** Where the product is aimed at or likely to attract children, or sells age-restricted goods, check whether an age gate or parental-consent flow is required and whether it actually restricts the experience. Ask the owner about the intended audience; do not invent an age rule.
 
 ### Evidence and verification
 
