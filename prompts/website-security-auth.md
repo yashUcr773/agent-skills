@@ -1,10 +1,23 @@
 # Website Security and Authentication — reusable prompt
 
-Audit and improve this website within the domain below. This prompt is self-contained and requires no installed skill or particular framework/agent. Use the repository, URL, goals, constraints, and prior decisions supplied in this conversation. Ask about consequential missing information.
+Version: 1.1.0
 
-Default to audit → user review → selected fixes → verification. If I explicitly request audit-and-fix, use that mode. If I request audit only, stop after the findings.
+Audit and improve this website within the domain below. This prompt is self-contained and requires no installed skill or particular framework/agent. Use the request details below and anything else supplied in this conversation: the repository, URL, goals, constraints, and prior decisions. Ask about consequential missing information.
+
+Default to audit → user review → selected fixes → verification. If I explicitly request audit-and-fix, use that mode. If I request audit only, stop after the findings. If I ask for a re-audit, re-check the saved findings instead of starting over.
 
 Use `SEC-001`, `SEC-002`, and so on for stable finding IDs. Apply the workflow below only to the requested domain and scope. Other domains mentioned in the checklist are related concerns, not required installed skills.
+
+## Request details
+
+Replace the bracketed values with what you know. Where a line is left unfilled, inspect first and ask me only if the answer changes the result.
+
+- Target: [repository path or website URL]
+- Goal: [what should improve]
+- Scope: [pages, components, or journeys]
+- Mode: [review first / audit only / audit and fix / re-audit]
+- Depth: [quick / standard / deep]
+- Constraints: [behavior, design, or integrations to preserve]
 
 ## Website improvement workflow
 
@@ -15,8 +28,19 @@ Use the actual repository, site, and conversation as evidence. The checklist ide
 - **Review first — default:** audit, present findings and proposed fixes, get the user's review, then implement the selected fixes with their corrections and verify them. During the audit, do not change application source, dependency/lock files, configuration, or hosted settings. Non-mutating inspection and existing diagnostic checks with ordinary temporary outputs are appropriate.
 - **Audit and fix — explicit option:** when the user explicitly requests auditing and fixing without an intermediate review, gather evidence and implement unambiguous fixes within the requested scope, then verify and report. This mode does not answer unresolved product questions or authorize unrelated live-system changes.
 - **Audit only — when requested:** report findings and stop. Do not turn an audit request into implementation.
+- **Re-audit — when requested:** when a findings file from an earlier audit exists and the user asks to re-check it, test each recorded finding against the current site and mark it fixed and verified, still open, regressed, or not verified, with the evidence. Do not repeat the whole audit or change application files. Record a new problem met along the way as a new finding.
 
 Use the mode requested in the conversation; no exact invocation phrase is required. Honor earlier review decisions and authorization. Do not ask again for approval already given for the same concrete scope. A later instruction to pause or narrow the task takes precedence.
+
+### Choose the depth
+
+Depth is separate from mode and defaults to standard.
+
+- **Quick:** a time-boxed pass over the critical journeys, shared layouts, and the checks named on each selected checklist's quick-pass line. Report it as a partial audit and list what was skipped.
+- **Standard — default:** the selected checklists across the agreed scope, sampling large sites as described below.
+- **Deep:** every in-scope route and state, repeated measurements, and adversarial or edge-case testing where it applies. Use it when requested or before a high-stakes launch.
+
+A quick pass can still surface a critical finding, but it cannot support a readiness claim.
 
 ### Clarify consequential choices
 
@@ -40,6 +64,34 @@ For each actionable finding record:
 
 Use critical for demonstrated severe exposure or loss, high for major security/reliability failures or blocked core journeys, medium for meaningful degradation, and low for minor defects. Keep preference-driven improvements optional rather than assigning artificial urgency. Do not print credentials, personal data, reset links, or session tokens in reports.
 
+Finding IDs must stay stable across the whole engagement. When the work will continue in a later session, or the user asks, offer to save the findings to `website-audit-findings.md` in a location the user chooses. Writing that file is not an application change, but ask before adding it to the repository, and keep secrets and personal data out of it. When the file already exists, read it first, keep its IDs and decisions, update statuses, and number new findings after the highest existing ID.
+
+Use this layout for the findings file so any later session can read it:
+
+```markdown
+# Website audit findings
+
+- Target: <repository or URL>
+- Last updated: <date>
+- Mode and depth: <mode>, <depth>
+- Scope: <routes, journeys, or areas covered>
+- Not covered: <areas skipped or not verified>
+
+| ID | Severity | Status | Location | Problem | Proposed change | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| SEC-001 | high | open | `server/orders.js` | Any signed-in user can read any order | Check ownership on the server | fix |
+
+## SEC-001
+
+- Confidence: <high / medium / low>
+- Evidence: <redacted reproduction or code path>
+- Impact: <who is affected and how>
+- Pass criteria: <observable result that proves the fix>
+- Verification: <what was re-checked, when, and the result>
+```
+
+Status is one of `open`, `fixed and verified`, `changed but not verified`, `deferred`, `not applicable`, or `regressed`. Decision records the user's choice: `fix`, `defer`, `change`, or `undecided`.
+
 ### Present the review
 
 In review-first mode, give a concise prioritized findings list and an actionable proposed scope before changing application files. Separate confirmed defects from options and questions. Ask the user which finding IDs to fix, defer, or change, and ask any concrete questions needed for that choice. Then pause implementation until their response. This review is the user checkpoint required by this workflow.
@@ -49,6 +101,8 @@ Apply the response as the implementation brief. If the user selects only some fi
 ### Implement within the agreed scope
 
 Use small, coherent changes and existing project conventions. Do not replace frameworks, add major dependencies, delete apparently unused features, introduce infrastructure, or rewrite copy based on guesswork. Check callers and runtime use before removing code or assets. Treat optional additions such as caching, analytics, service workers, CAPTCHAs, load balancers, and new tests as choices driven by a demonstrated need.
+
+Fix one finding at a time. Keep each finding's change separate enough to review and revert on its own, verify it against its pass criteria before starting the next, and update the findings file when one exists. Commit or push only when the user has asked; when they have, make one commit per finding or small related group and name the finding IDs in the message.
 
 Use isolated fixtures, test accounts, sandbox payments, and test email destinations where applicable. Do not send real messages, charge/refund money, rotate live credentials, change DNS, deploy, apply production migrations, or alter retention/data without that action being in the user's authorized scope. Read-only access is not authorization to mutate a live service. Prepare reviewable code/configuration and ask for the specific missing authority only when the next step needs it.
 
@@ -62,44 +116,95 @@ Check the production build when relevant. A screenshot does not prove an interac
 
 Report what changed and why, what was verified and where, what still fails, and what was deferred or needs user input. Keep **fixed and verified**, **changed but not verified**, **unfixed**, and **not applicable** distinct. Describe unavailable browsers, devices, accounts, network conditions, or infrastructure evidence explicitly. Stop when the agreed scope is complete and report any remaining work without implying it was done.
 
+End every report with an **Owner actions** list: the things only the owner can do or confirm. Typical items are DNS and registrar changes, credential rotation, legal and policy sign-off, switching payments to live mode, settings in a hosting or provider dashboard, and product decisions left open. For each, say what to do, where, and why it could not be done or verified here.
+
 ## Security, authentication, and prototype leaks
 
-Source checklist sections: 16 (security), 17 (authentication), 31 (common prototype/vibe-coded leaks).
+Quick pass: Exposure sweep; Authorization; Row-level security; Data-store and cloud permissions; Injection; Token storage and JWTs.
+
+Severity examples: critical — an anonymous visitor or any signed-in user can read or change other users' data, or a live privileged credential is exposed; high — injection, stored XSS, or account takeover that needs some precondition; medium — missing hardening such as security headers, rate limits, or enumeration protection; low — version disclosure and minor information leaks.
 
 ### Establish the trust boundaries
 
-Map public, authenticated, administrative, tenant-specific, storage, and server-only surfaces. Identify the session/auth provider and actual authorization model. Inspect source and configuration and use controlled test accounts for runtime checks. Active attack probes against a live site require an authorized target and scope; prefer local/test environments. Missing credentials or inaccessible code means not verified, not secure.
+Map public, authenticated, administrative, tenant-specific, storage, and server-only surfaces. Identify the session/auth provider and actual authorization model. Inspect source and configuration and use controlled test accounts for runtime checks. Review each entry point as an attacker would: consider what an anonymous visitor, an ordinary account, and a tampered client could attempt, and record confirmed defects separately from potential weaknesses that still need evidence. Active attack probes against a live site require an authorized target and scope; prefer local/test environments. Missing credentials or inaccessible code means not verified, not secure.
 
 ### Secrets and prototype artifacts
 
-- Inspect source, relevant build output, public environment variables, debug/dev routes, configuration, and applicable repository history for unintended exposure. Redact values; report a file/route and credential category rather than copying the secret.
-- Distinguish intentionally public client configuration from privileged material. Firebase/Supabase-style client configuration is not automatically a leaked secret; evaluate server/service keys, key restrictions, data rules, and effective permissions. `NEXT_PUBLIC_*` and equivalent variables reach the browser and must not carry server credentials.
-- Look for demo/placeholder keys, hardcoded admin identities, localhost/example domains and contacts, fake search/login/checkout/newsletter flows, mock API responses, fixture arrays, sample avatars, debug panels, unprotected admin pages, remote image mistakes, permissive CORS, and wildcard OAuth/redirect rules.
-- Confirm intended production behavior before replacing mocks, deleting fixtures, removing unsupported claims, or changing identity providers. Content authenticity belongs to content review; nonfunctional actions to interactions; exploitable exposure to this audit.
-- If a real credential is exposed, identify the affected system without revealing the value, recommend revocation/rotation, and prepare scoped source/configuration fixes. Deleting the current source value does not revoke a credential or erase history. Live rotation and history rewrites require scope for those actions and coordination of dependent services.
+- **Exposure sweep.** Inspect source, relevant build output, public environment variables, debug/dev routes, configuration, and applicable repository history for unintended exposure. Redact values; report a file/route and credential category rather than copying the secret.
+- **Served files and history.** Check that the deployed site does not serve `.env` files, backups, database dumps, or repository metadata, and look for database credentials or connection strings in client code, logs, and committed configuration. Where history is in scope, scan it with an available secret scanner; a clean working tree does not show what earlier commits contain.
+- **Public versus privileged configuration.** Distinguish intentionally public client configuration from privileged material. Firebase/Supabase-style client configuration is not automatically a leaked secret; evaluate server/service keys, key restrictions, data rules, and effective permissions. `NEXT_PUBLIC_*` and equivalent variables reach the browser and must not carry server credentials.
+- **Prototype leftovers.** Look for demo/placeholder keys, default or seed credentials, hardcoded admin identities, localhost/example domains and contacts, fake search/login/checkout/newsletter flows, mock API responses, fixture arrays, sample avatars, debug panels, unprotected admin pages, remote image mistakes, permissive CORS, and wildcard OAuth/redirect rules.
+- **AI tooling leftovers.** Look for files left behind by AI coding tools and agents: committed agent or editor configuration that contains tokens, tool or MCP server settings with credentials, prompt and conversation logs, generated scratch files, and local environment files. Check that instruction files do not disclose internal URLs or secrets, and that none of this is served by the site.
+- **Intended behavior.** Confirm intended production behavior before replacing mocks, deleting fixtures, removing unsupported claims, or changing identity providers. Content authenticity belongs to content review; nonfunctional actions to interactions; exploitable exposure to this audit.
+- **Exposed credentials.** If a real credential is exposed, identify the affected system without revealing the value, recommend revocation/rotation, and prepare scoped source/configuration fixes. Deleting the current source value does not revoke a credential or erase history. Live rotation and history rewrites require scope for those actions and coordination of dependent services.
+- **Secret rotation.** Check whether there is a known procedure for rotating each credential the site depends on, who can perform it, and which services must be updated together. A secret that cannot be rotated without downtime or guesswork is a finding even when it is not exposed. Do not rotate live credentials as a test.
 
 ### Server-side access and injection defenses
 
-- Verify authentication and object/action authorization on the server for every sensitive operation. Test cross-user and cross-role access with safe fixtures, including IDs supplied by the browser. Hidden buttons are not enforcement.
-- Check tenant boundaries and database row-level security when the architecture relies on it. Do not assume every backend requires RLS or that enabling it alone establishes a complete policy.
-- Inspect parameterized database access, context-appropriate output encoding, unsafe HTML/DOM operations, shell invocation, path construction, and upload/storage paths for SQL injection, XSS, command injection, and traversal. Do not equate generic input sanitization with protection in every context.
-- Verify upload limits and content validation, executable-content handling, storage/serving isolation, and authorization to download private files. Do not trust client MIME/type declarations alone.
-- Inspect CSRF protections in the context of the session and credential transport. Review CORS origin/credentials behavior and redirect/callback allowlists; avoid broad wildcards and unvalidated destinations.
+- **Authorization.** Verify authentication and object/action authorization on the server for every sensitive operation. Test cross-user, cross-tenant, and cross-role access (IDOR/BOLA) with at least two safe fixture accounts, including IDs supplied by the browser. Hidden buttons and client-side role checks are not enforcement.
+- **Field tampering.** Check which fields the server accepts on create and update requests. Client-supplied role, ownership, tenant, price, status, or verification fields must be ignored or authorized, not bound directly to stored records (field tampering/mass assignment). Test by adding or altering such fields with a safe fixture.
+- **Row-level security.** Check tenant boundaries and database row-level security when the architecture relies on it. Do not assume every backend requires RLS or that enabling it alone establishes a complete policy.
+- **Data-store and cloud permissions.** Review effective database, storage, and cloud permissions: open read/write rules, policies that allow every caller, ordinary requests served with owner/superuser or service-role credentials, databases reachable from the public internet, buckets that allow public listing or writing or expose private objects, and permissive access policies or exposed consoles/ports. Apply least privilege to what the application needs, confirm intentionally public assets before restricting them, and do not change live permissions without scope for that action.
+- **Dangling DNS.** Where DNS records are visible, look for subdomains that point at deprovisioned hosting, storage, or SaaS resources another party could claim. Report them; changing DNS needs scope for that action.
+- **Injection.** Inspect parameterized database access, context-appropriate output encoding, unsafe HTML/DOM operations, shell invocation, path construction, and upload/storage paths for SQL and NoSQL/query-operator injection, XSS, command injection, traversal, and unsafe deserialization of untrusted data. Do not equate generic input sanitization with protection in every context.
+- **SSRF.** Where the server fetches URLs influenced by users, such as webhooks, link previews, imports, or image proxies, check SSRF defenses: destination validation, redirect handling, and access to internal or cloud-metadata addresses.
+- **Uploads.** Verify upload limits and content validation, executable-content handling, storage/serving isolation, and authorization to download private files. Do not trust client MIME/type declarations alone.
+- **CSRF and CORS.** Inspect CSRF protections in the context of the session and credential transport. Review CORS origin/credentials behavior and redirect/callback allowlists; avoid broad wildcards and unvalidated destinations.
+- **GraphQL and real-time channels.** Where present, check authorization on every resolver and field, not only at the gateway; query depth, complexity, and batching limits; and whether introspection or a playground is exposed in production on purpose. Check that WebSocket and server-sent-event connections authenticate when they connect, authorize each subscription or message, and validate origin.
+- **Business-logic abuse.** Look for flows that work as coded but can be misused: skipping a step in a multi-step process, replaying a one-time action, exceeding plan limits or quotas, manipulating referral or invitation credit, and racing two requests for a single-use resource. Test with safe fixtures.
 
 ### Transport, cookies, and browser policy
 
-- Check HTTPS and redirects, TLS evidence where available, and secure cookie flags suited to the session: Secure, HttpOnly where script access is unnecessary, and intentional SameSite behavior. Test login, embedded flows, and cross-site callbacks affected by changes.
-- Evaluate HSTS deliberately, especially long lifetimes, `includeSubDomains`, and preload implications. Do not enable irreversible/broad transport commitments before verifying affected hosts and operational intent.
-- Review Content Security Policy, content-type sniffing protection, frame/embed controls, and referrer policy against actual resource/embed needs. Develop and verify policy changes without blindly breaking scripts, login, payments, or intentional embedding.
-- Reduce unnecessary server/version disclosure and raw internal errors where practical. Hiding a header does not remediate an underlying vulnerable component.
+- **HTTPS and cookies.** Check HTTPS and redirects, TLS evidence where available, and secure cookie flags suited to the session: Secure, HttpOnly where script access is unnecessary, and intentional SameSite behavior. Test login, embedded flows, and cross-site callbacks affected by changes.
+- **Token storage and JWTs.** Check where session and refresh tokens are held. Tokens in `localStorage` or `sessionStorage` are readable by any injected script; prefer HttpOnly cookies when the architecture allows, and review CSRF protection together with any change of token transport. Where JWTs are used, verify signature, algorithm, expiry, and audience checks, and that the signing secret is strong, server-only, and not a default or example value.
+- **HSTS.** Evaluate HSTS deliberately, especially long lifetimes, `includeSubDomains`, and preload implications. Do not enable irreversible/broad transport commitments before verifying affected hosts and operational intent.
+- **Browser policy headers.** Review Content Security Policy, content-type sniffing protection, frame/embed controls, and referrer policy against actual resource/embed needs. Develop and verify policy changes without blindly breaking scripts, login, payments, or intentional embedding.
+- **Third-party scripts.** Inventory scripts loaded from other origins. Use Subresource Integrity for fixed-version files where the provider supports it, prefer self-hosted or pinned versions over mutable URLs, and remove scripts that are no longer used. Integrity hashes break deliberately mutable scripts such as tag managers; do not add them blindly.
+- **Disclosure.** Reduce unnecessary server/version disclosure and raw internal errors where practical. Hiding a header does not remediate an underlying vulnerable component.
+- **Disclosure contact.** Check whether the site offers a way to report a vulnerability, such as a `security.txt` file under `/.well-known/` with a monitored contact. Propose one where the site has accounts or sensitive data; the contact address and policy are the owner's to choose.
 
 ### Account and session journeys
 
-- Test signup, login, incorrect credentials, logout, duplicate signup, email verification, expired verification links, password reset/change, expired reset links, session expiry, refresh behavior, and protected routes where present.
-- For password visibility toggles, check that intentional reveal affects only the relevant field, starts masked on a fresh form, preserves password-manager/autofill behavior, and does not submit or duplicate the secret into logs, analytics, clipboard, persistent client state, or print output. Masking is a display choice, not encryption or authorization.
-- Verify safe login/logout redirects and intended-destination preservation without open redirects. Check enumeration risk in visible messages, status codes, and materially observable timing without destructive bulk tests.
-- Review rate limits for login and reset, secure random reset/verification tokens, appropriate expiry and single use, and session invalidation after relevant password/security changes. Redact tokens in logs and artifacts.
-- Evaluate MFA according to account risk and product requirements; adding a new auth capability needs a product decision. Test role changes, concurrent sessions, multi-tab logout, and sensitive-state cleanup.
+- **Account journeys.** Test signup, login, incorrect credentials, logout, duplicate signup, email verification, expired verification links, password reset/change, expired reset links, session expiry, refresh behavior, and protected routes where present.
+- **Password visibility.** For password visibility toggles, check that intentional reveal affects only the relevant field, starts masked on a fresh form, preserves password-manager/autofill behavior, and does not submit or duplicate the secret into logs, analytics, clipboard, persistent client state, or print output. Masking is a display choice, not encryption or authorization.
+- **Redirects and enumeration.** Verify safe login/logout redirects and intended-destination preservation without open redirects. Check enumeration risk in visible messages, status codes, and materially observable timing without destructive bulk tests.
+- **Rate limits and tokens.** Review rate limits for login and reset, secure random reset/verification tokens, appropriate expiry and single use, session identifier rotation at login, server-side invalidation at logout, and session invalidation after relevant password/security changes. Redact tokens in logs and artifacts.
+- **Automated abuse.** Check defenses against credential stuffing, signup and form bots, and scripted enumeration: rate limits by account and by source, breached-password checks, lockout or step-up that cannot be used to lock out legitimate users, and monitoring of failed-login spikes. Match controls to observed risk and weigh the accessibility and privacy cost of a CAPTCHA.
+- **Password handling.** Review password handling: storage with a current password-hashing algorithm, never plaintext, reversible encryption, or a fast hash; a server-enforced policy that favors length and rejects common or breached passwords over arbitrary composition rules; and strength feedback that helps users without sending the password to analytics or third parties. A client-side strength meter alone is not enforcement, and changing the policy for existing accounts is a product decision.
+- **MFA and roles.** Evaluate MFA according to account risk and product requirements; adding a new auth capability needs a product decision. Test role changes, concurrent sessions, multi-tab logout, and sensitive-state cleanup.
+- **OAuth and SSO.** Where third-party sign-in is used, check the `state` parameter and PKCE where the flow calls for them, exact redirect URI matching, token validation of issuer, audience, and expiry, and account linking that cannot attach an attacker's identity to an existing account through an unverified email.
+- **Sensitive changes.** Check that changing the email address, password, MFA settings, or payout details, or deleting the account, requires recent authentication, and that the previous address is notified of email and password changes.
+- **Audit records.** Where accounts or sensitive data exist, check that security-relevant actions such as sign-ins and failures, password/MFA changes, role or permission changes, administrative operations, and bulk exports or deletions leave an attributable audit record of actor, action, target, and time, without secrets or unnecessary personal data. Retention and tooling belong to operations.
+
+### AI and LLM features
+
+Apply this section only when the site calls a language model or similar AI service. Test with safe fixtures and low volume; do not run abusive load against a paid API.
+
+- **Keys and cost.** Model API keys must stay server-side. Check that model endpoints require the intended authentication and have per-user and overall rate and spend limits, so an anonymous caller cannot run up cost or use the site as a free proxy.
+- **Prompt injection.** Treat user input and any retrieved content, such as web pages, documents, emails, and other users' data, as untrusted instructions. Check what the model can reach through tools, retrieval, or function calls: its privileges should not exceed the requesting user's, and consequential actions need server-side authorization or confirmation, not the model's judgment.
+- **Output handling.** Treat model output as untrusted. Encode it before rendering, do not pass it unchecked into HTML, SQL, shell commands, URLs, or file paths, and validate structured output before acting on it.
+- **Data exposure.** Check that system prompts hold no secrets, that retrieval respects per-user and per-tenant permissions, and that prompts, uploads, and conversation logs are stored, retained, and shared with providers as the privacy policy states.
+
+### Stack-specific checks
+
+Apply only the bullets for a stack the site actually uses. Platform defaults change between versions; confirm against the current documentation for the installed version.
+
+- **Next.js public variables.** Variables prefixed `NEXT_PUBLIC_` are inlined into the client bundle at build time. Check that none carries a secret, and that server-only values are not passed to client components as props or imported into client modules.
+- **Next.js server entry points.** Treat every Server Action, Route Handler, and API route as a public endpoint. Each must authenticate and authorize the caller and validate its input itself; a check in middleware, a layout, or the page that renders the form does not protect the action or handler behind it.
+- **Next.js data sent to the client.** Check what Server Components pass to Client Components and what route handlers return. Whole database records often carry fields the user should not receive.
+- **Next.js images and redirects.** Check `images.remotePatterns` or the older `domains` setting for wildcards, and `redirects`, `rewrites`, and any post-login redirect parameter for open-redirect or open-proxy risk.
+- **Vercel environments and previews.** Check which variables are exposed to the Preview and Development environments, whether preview deployments are publicly reachable, and whether they read or write production data.
+- **Supabase row-level security.** Every table reachable through the API needs RLS enabled with a policy for each operation; a table with RLS disabled is readable and writable with the public key. Look for policies whose condition is always true, insert and update policies without a `WITH CHECK` clause, and views or `SECURITY DEFINER` functions that bypass RLS. Test with the public key and with two user sessions.
+- **Supabase keys.** The anon or publishable key is meant to be public. The service-role or secret key bypasses RLS and must exist only on a server; search the client bundle, public environment variables, and browser-executed code for it.
+- **Supabase storage.** Check bucket visibility and storage policies. A public bucket serves every object to anyone with the URL; a private bucket needs policies that scope upload, read, and delete to the owner.
+- **Supabase auth settings.** Check the Site URL and redirect allow list for wildcards, email confirmation and password requirements, and any authorization decision that reads user-editable metadata, which a signed-in user can change for themselves.
+- **Firebase security rules.** Check Firestore, Realtime Database, and Storage rules for test-mode or expiring open rules, rules that allow all reads or writes, rules that only require a signed-in user where per-user ownership is needed, and missing validation of written fields. Test with the emulator or rules unit tests, not against production data.
+- **Firebase config and admin credentials.** The web app config, including its API key, is public by design; protection comes from security rules and App Check. Service-account keys and Admin SDK credentials must never reach the client or the repository. Check API key restrictions in the cloud console where they apply.
+- **Firebase functions and App Check.** Check that callable and HTTP functions verify authentication and authorization themselves and validate input, that App Check is enforced where the owner intends it, and that custom claims used for roles are set only by trusted server code.
+- **Clerk sessions.** Verify the session on the server, with the provider's server helpers, for every protected page, route handler, and server action. Check which routes the middleware actually protects, since hiding UI in client components or relying on middleware alone is not enforcement. Organization and role checks must read verified session claims, and webhooks must verify their signature.
+- **Auth.js sessions.** Check that the auth secret is a strong server-only value in every environment, that IDs or roles added in the `jwt` and `session` callbacks come from the database and not from client input, that protected routes and handlers check the session on the server, and that automatic account linking by email is not enabled for providers that do not verify email addresses.
+- **Auth0 tokens.** Check that APIs validate the access token's signature, issuer, audience, and expiry, not only its presence; that allowed callback, logout, and web-origin URLs carry no broader wildcard than needed; that roles and permissions come from verified token claims set by a trusted Action; and that ID tokens are not used to authorize API calls.
+- **Better Auth configuration.** Check that the secret and base URL are set per environment, that trusted origins are listed explicitly, that protected routes and handlers check the session on the server, that email verification and rate limiting are enabled where the product needs them, and that role or admin checks are enforced server-side.
 
 ### Dependencies and verification
 
