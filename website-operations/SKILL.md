@@ -1,11 +1,16 @@
 ---
 name: website-operations
-description: Audit and improve website environment/deployment configuration, observability, backup/recovery readiness, contact delivery, and transactional email. Review before fixes unless audit-and-fix is explicitly requested; distinguish preparation from live operations.
+description: Audit and improve website environment/deployment configuration, CI/CD and operator access, cost controls, domain and certificate expiry, observability and incident readiness, backup/recovery readiness, contact delivery, and transactional email. Review before fixes unless audit-and-fix is explicitly requested; distinguish preparation from live operations.
+metadata:
+  version: "1.1.0"
+  prompt-hash: "5aa83354b9f3"
 ---
 
 # Website Operations and Email
 
-This skill is self-contained, framework agnostic, and agent agnostic. Default to audit, user review, then selected fixes and verification. Use audit-and-fix only when explicitly requested.
+This skill is self-contained, framework agnostic, and agent agnostic. Default to audit, user review, then selected fixes and verification. Use audit-and-fix or audit only when the user asks for it, and re-audit when they ask to re-check saved findings.
+
+Take the target, goal, scope, mode, depth, and constraints from the conversation. Inspect first, and ask only where a missing answer changes the result.
 
 Use `OPS-001`, `OPS-002`, and so on for stable finding IDs. Apply the workflow below only to the requested domain and scope. Other domains mentioned in the checklist are related concerns, not required installed skills.
 
@@ -18,8 +23,19 @@ Use the actual repository, site, and conversation as evidence. The checklist ide
 - **Review first — default:** audit, present findings and proposed fixes, get the user's review, then implement the selected fixes with their corrections and verify them. During the audit, do not change application source, dependency/lock files, configuration, or hosted settings. Non-mutating inspection and existing diagnostic checks with ordinary temporary outputs are appropriate.
 - **Audit and fix — explicit option:** when the user explicitly requests auditing and fixing without an intermediate review, gather evidence and implement unambiguous fixes within the requested scope, then verify and report. This mode does not answer unresolved product questions or authorize unrelated live-system changes.
 - **Audit only — when requested:** report findings and stop. Do not turn an audit request into implementation.
+- **Re-audit — when requested:** when a findings file from an earlier audit exists and the user asks to re-check it, test each recorded finding against the current site and mark it fixed and verified, still open, regressed, or not verified, with the evidence. Do not repeat the whole audit or change application files. Record a new problem met along the way as a new finding.
 
 Use the mode requested in the conversation; no exact invocation phrase is required. Honor earlier review decisions and authorization. Do not ask again for approval already given for the same concrete scope. A later instruction to pause or narrow the task takes precedence.
+
+### Choose the depth
+
+Depth is separate from mode and defaults to standard.
+
+- **Quick:** a time-boxed pass over the critical journeys, shared layouts, and the checks named on each selected checklist's quick-pass line. Report it as a partial audit and list what was skipped.
+- **Standard — default:** the selected checklists across the agreed scope, sampling large sites as described below.
+- **Deep:** every in-scope route and state, repeated measurements, and adversarial or edge-case testing where it applies. Use it when requested or before a high-stakes launch.
+
+A quick pass can still surface a critical finding, but it cannot support a readiness claim.
 
 ### Clarify consequential choices
 
@@ -43,6 +59,34 @@ For each actionable finding record:
 
 Use critical for demonstrated severe exposure or loss, high for major security/reliability failures or blocked core journeys, medium for meaningful degradation, and low for minor defects. Keep preference-driven improvements optional rather than assigning artificial urgency. Do not print credentials, personal data, reset links, or session tokens in reports.
 
+Finding IDs must stay stable across the whole engagement. When the work will continue in a later session, or the user asks, offer to save the findings to `website-audit-findings.md` in a location the user chooses. Writing that file is not an application change, but ask before adding it to the repository, and keep secrets and personal data out of it. When the file already exists, read it first, keep its IDs and decisions, update statuses, and number new findings after the highest existing ID.
+
+Use this layout for the findings file so any later session can read it:
+
+```markdown
+# Website audit findings
+
+- Target: <repository or URL>
+- Last updated: <date>
+- Mode and depth: <mode>, <depth>
+- Scope: <routes, journeys, or areas covered>
+- Not covered: <areas skipped or not verified>
+
+| ID | Severity | Status | Location | Problem | Proposed change | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| SEC-001 | high | open | `server/orders.js` | Any signed-in user can read any order | Check ownership on the server | fix |
+
+## SEC-001
+
+- Confidence: <high / medium / low>
+- Evidence: <redacted reproduction or code path>
+- Impact: <who is affected and how>
+- Pass criteria: <observable result that proves the fix>
+- Verification: <what was re-checked, when, and the result>
+```
+
+Status is one of `open`, `fixed and verified`, `changed but not verified`, `deferred`, `not applicable`, or `regressed`. Decision records the user's choice: `fix`, `defer`, `change`, or `undecided`.
+
 ### Present the review
 
 In review-first mode, give a concise prioritized findings list and an actionable proposed scope before changing application files. Separate confirmed defects from options and questions. Ask the user which finding IDs to fix, defer, or change, and ask any concrete questions needed for that choice. Then pause implementation until their response. This review is the user checkpoint required by this workflow.
@@ -52,6 +96,8 @@ Apply the response as the implementation brief. If the user selects only some fi
 ### Implement within the agreed scope
 
 Use small, coherent changes and existing project conventions. Do not replace frameworks, add major dependencies, delete apparently unused features, introduce infrastructure, or rewrite copy based on guesswork. Check callers and runtime use before removing code or assets. Treat optional additions such as caching, analytics, service workers, CAPTCHAs, load balancers, and new tests as choices driven by a demonstrated need.
+
+Fix one finding at a time. Keep each finding's change separate enough to review and revert on its own, verify it against its pass criteria before starting the next, and update the findings file when one exists. Commit or push only when the user has asked; when they have, make one commit per finding or small related group and name the finding IDs in the message.
 
 Use isolated fixtures, test accounts, sandbox payments, and test email destinations where applicable. Do not send real messages, charge/refund money, rotate live credentials, change DNS, deploy, apply production migrations, or alter retention/data without that action being in the user's authorized scope. Read-only access is not authorization to mutate a live service. Prepare reviewable code/configuration and ask for the specific missing authority only when the next step needs it.
 
@@ -65,9 +111,13 @@ Check the production build when relevant. A screenshot does not prove an interac
 
 Report what changed and why, what was verified and where, what still fails, and what was deferred or needs user input. Keep **fixed and verified**, **changed but not verified**, **unfixed**, and **not applicable** distinct. Describe unavailable browsers, devices, accounts, network conditions, or infrastructure evidence explicitly. Stop when the agreed scope is complete and report any remaining work without implying it was done.
 
+End every report with an **Owner actions** list: the things only the owner can do or confirm. Typical items are DNS and registrar changes, credential rotation, legal and policy sign-off, switching payments to live mode, settings in a hosting or provider dashboard, and product decisions left open. For each, say what to do, where, and why it could not be done or verified here.
+
 ## Deployment, observability, and email operations
 
-Source checklist sections: 23 (email/contact), 24 (deployment/infrastructure), 25 (observability).
+Quick pass: Environments; Backups; Operator access; Cost controls; Error tracking and logs; Form delivery.
+
+Severity examples: critical — there is no usable backup of production data, or production secrets are reachable by the public; high — a deploy cannot be rolled back, or an outage would go unnoticed; medium — missing health checks, noisy or sensitive logs, or undelivered contact email; low — documentation gaps.
 
 ### Establish environments and operational ownership
 
@@ -77,27 +127,41 @@ Audit with read-only evidence. Code/configuration preparation is distinct from c
 
 ### Deployment and delivery
 
-- Check environment separation, server/public variables, actual production API origins, localhost/example URLs, debug mode, excessive console output, and unintended public dev/admin routes. Staging indexing restrictions do not replace access control when the environment should be private.
-- Review source-map contents and exposure. Remove public sensitive material where needed while preserving private debugging artifacts when useful; source maps are not automatically secrets, and hiding maps does not protect secrets shipped in a bundle.
-- Inspect relevant TLS/certificate, DNS, redirect, caching, CDN, compression, and asset-version behavior using available evidence. Make infrastructure additions only for a demonstrated delivery or capacity need.
-- Check health/readiness probes, graceful shutdown, worker/request draining, and failure recovery. Consider load balancing/autoscaling only when traffic, architecture, and measured constraints justify them.
-- Review deployment rollback, immutable/versioned artifacts, compatible migrations, environment configuration, and whether downtime requirements are established. Prepare a concrete rollout/rollback plan for risky changes and verify it in a suitable nonproduction environment where possible.
-- Inspect backup scope, encryption/access where relevant, freshness, retention, capacity/storage monitoring, and restore evidence. A configured backup job does not prove recoverability. Test restores into isolated targets; never overwrite a live database to demonstrate a backup works.
+- **Environments.** Check environment separation, server/public variables, actual production API origins, localhost/example URLs, debug mode, excessive console output, and unintended public dev/admin routes. Staging indexing restrictions do not replace access control when the environment should be private.
+- **Source maps.** Review source-map contents and exposure. Remove public sensitive material where needed while preserving private debugging artifacts when useful; source maps are not automatically secrets, and hiding maps does not protect secrets shipped in a bundle.
+- **Delivery configuration.** Inspect relevant TLS/certificate, DNS, redirect, caching, CDN, compression, and asset-version behavior using available evidence. Make infrastructure additions only for a demonstrated delivery or capacity need.
+- **Health and shutdown.** Check health/readiness probes, graceful shutdown, worker/request draining, and failure recovery. Consider load balancing/autoscaling only when traffic, architecture, and measured constraints justify them.
+- **Rollout and rollback.** Review deployment rollback, immutable/versioned artifacts, compatible migrations, environment configuration, and whether downtime requirements are established. Prepare a concrete rollout/rollback plan for risky changes and verify it in a suitable nonproduction environment where possible.
+- **Backups.** Inspect backup scope, encryption/access where relevant, freshness, retention, capacity/storage monitoring, and restore evidence. A configured backup job does not prove recoverability. Test restores into isolated targets; never overwrite a live database to demonstrate a backup works.
+- **Domain and certificate expiry.** Check domain registration expiry and auto-renewal, registrar lock, certificate expiry and automatic renewal, and who receives the expiry notices.
+- **Pipeline permissions.** Inspect CI/CD for least-privilege deploy tokens, secrets exposed to untrusted branches or forks, unpinned third-party actions or scripts, branch protection and required checks on the deploy branch, and preview deployments that expose private data.
+- **Operator access.** Review who can reach production hosting, the database, DNS and the registrar, the source repository, payment and email providers, and analytics. Look for shared logins, former collaborators, over-broad roles, and administrator accounts without multi-factor authentication. Report findings; removing access or changing roles is the owner's decision.
+- **Cost controls.** Identify usage-billed services such as hosting, serverless functions, databases, storage, email, SMS, and model APIs. Check for budget alerts, spend caps or quotas where the provider offers them, and limits on anything an anonymous visitor can trigger. Ask the owner for thresholds; do not set a hard cap that could take the site down without their decision.
+- **Load testing.** Before a launch or campaign that will change traffic, check whether expected peak load has been estimated and tested in a production-like environment, including the database, third-party quotas, and autoscaling limits. Do not load test production or a third-party service without authorization.
+- **Dependency updates.** Check whether dependency and base-image updates are surfaced automatically, for example by an update bot or a scheduled audit, and whether someone reviews and merges them. Enabling a bot is a proposal for the owner.
 
 ### Observability
 
-- Inspect frontend/server error tracking, useful structured logs, and correlation/request IDs where they help diagnose cross-service failures. Avoid passwords, tokens, personal form contents, and unnecessary sensitive data in logs or telemetry.
-- Check visibility into uptime, API/frontend errors, latency, database performance, queues, failed jobs, and payment webhook failures as applicable. Use existing systems before introducing a provider.
-- Verify that critical alerts reach the intended operator and have actionable context using authorized test channels. Ask about alert recipients and thresholds if missing; do not send unsolicited alerts or configure noisy blanket alarms.
-- Review searchability, access, retention, and deletion behavior against operational needs and approved data practices. Do not invent log retention durations or silently change provider billing plans.
+- **Error tracking and logs.** Inspect frontend/server error tracking, useful structured logs, and correlation/request IDs where they help diagnose cross-service failures. Avoid passwords, tokens, personal form contents, and unnecessary sensitive data in logs or telemetry.
+- **Monitoring.** Check visibility into uptime, API/frontend errors, latency, database performance, queues, failed jobs, and payment webhook failures as applicable. Use existing systems before introducing a provider.
+- **Alerts.** Verify that critical alerts reach the intended operator and have actionable context using authorized test channels. Ask about alert recipients and thresholds if missing; do not send unsolicited alerts or configure noisy blanket alarms.
+- **Log retention.** Review searchability, access, retention, and deletion behavior against operational needs and approved data practices, including audit records of security-relevant actions, which should not be alterable by the accounts they describe. Do not invent log retention durations or silently change provider billing plans.
+- **Incident readiness.** Check whether there is a short written procedure for the likely failures, such as the site being down, a bad deploy, data loss, or a leaked credential, naming who is contacted, how to roll back, and where status is communicated. Its absence is a finding for a site with real users; drafting one needs the owner's inputs.
+- **Status communication.** Check whether the owner and users can tell when the site is down: an external uptime check, and a status page or agreed channel for announcing incidents. Propose one in proportion to the site's audience.
 
 ### Contact and email delivery
 
-- Check approved email/phone values and `mailto:`/`tel:` behavior. Avoid exposing a private mailbox where a public contact route is intended.
-- Trace contact form submission to actual delivery. Check From, Reply-To, sender identity, address validation, and header-injection prevention; do not put arbitrary user-supplied addresses in a trusted sender header.
-- Inspect sender domain verification and SPF, DKIM, and DMARC against provider guidance and actual DNS. Distinguish application configuration, DNS publication, authentication results, and inbox delivery; none alone proves all the others.
-- Review contact, receipt, password-reset, verification, and other relevant transactional messages in authorized test delivery. Check mobile readability, link origins, HTTPS, deep links, expected token expiration/single use, and absence of leaked tokens in reports.
-- Check unsubscribe and communication preferences where required by the message type and applicable rules. Do not automatically add marketing behavior to transactional flows or invent mailing-list membership.
+- **Contact links.** Check approved email/phone values and `mailto:`/`tel:` behavior. Avoid exposing a private mailbox where a public contact route is intended.
+- **Form delivery.** Trace contact form submission to actual delivery. Check From, Reply-To, sender identity, address validation, and header-injection prevention; do not put arbitrary user-supplied addresses in a trusted sender header.
+- **Sender authentication.** Inspect sender domain verification and SPF, DKIM, and DMARC against provider guidance and actual DNS. Distinguish application configuration, DNS publication, authentication results, and inbox delivery; none alone proves all the others.
+- **Transactional messages.** Review contact, receipt, password-reset, verification, and other relevant transactional messages in authorized test delivery. Check mobile readability, link origins, HTTPS, deep links, expected token expiration/single use, and absence of leaked tokens in reports.
+- **Unsubscribe.** Check unsubscribe and communication preferences where required by the message type and applicable rules. Do not automatically add marketing behavior to transactional flows or invent mailing-list membership.
+- **Bounces and complaints.** Check that hard bounces and spam complaints are processed and suppress further sending, and that the provider's reputation or bounce-rate signals are visible to someone. Do not generate bounces against real addresses to test this.
+- **Email rendering.** Check transactional emails in dark mode, in common clients, with images blocked, and with a screen reader: meaningful alternative text, readable contrast, a plain-text part, and links that are distinguishable without color.
+
+### Stack-specific checks
+
+When the site uses Vercel, Supabase, or Firebase, read [references/stack-checks.md](references/stack-checks.md) and apply the checks for the stack in use. Skip it for other stacks.
 
 ### Evidence and verification
 
