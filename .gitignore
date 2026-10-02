@@ -1,0 +1,10 @@
+__pycache__/
+.DS_Store
+
+# Installed and generated files of the benchmark site. The site itself has no
+# .gitignore on purpose; that is one of its planted defects.
+benchmark/site/node_modules/
+benchmark/site/dist/
+benchmark/site/data/
+benchmark/site/package-lock.json
+benchmark/stack-site/package-lock.json
