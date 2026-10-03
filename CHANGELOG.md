@@ -4,6 +4,13 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## fix-website
 
+### 2.1.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+- Added the Response contents check and put it on the quick-pass line. Password handling now also covers passwords and tokens written to the console, logs, or error tracking.
+
 ### 2.0.0 — 2026-10-03
 
 - Merged `improve-website` into this skill. It now carries the shared workflow, the routing table, and the ten labeled domain checklists.
@@ -26,6 +33,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-ui-accessibility
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: conformance target, text direction, route changes, time limits, accessible authentication, dragging alternatives, documents and downloads, accessibility statement.
@@ -36,6 +49,12 @@ Each skill and the prompt it is written from share one version number. The promp
 - Initial release.
 
 ## website-interactions
+
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
 
 ### 1.1.0 — 2026-10-03
 
@@ -48,6 +67,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-content-branding
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: single primary CTA, translations, asset licensing, and a conversion and clarity section covering value proposition, pricing clarity, signup friction, first-run experience, and AI-generated content disclosure.
@@ -58,6 +83,12 @@ Each skill and the prompt it is written from share one version number. The promp
 - Initial release.
 
 ## website-seo-discoverability
+
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
 
 ### 1.1.0 — 2026-10-03
 
@@ -71,6 +102,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-performance
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: load-time targets, server response time, back/forward cache, and a performance budget as a regression guard.
@@ -83,6 +120,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-backend-reliability
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: background jobs and queues, upstream dependencies, flaky tests, and whether tests run automatically.
@@ -94,6 +137,13 @@ Each skill and the prompt it is written from share one version number. The promp
 - Initial release.
 
 ## website-security-auth
+
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+- Added the Response contents check and put it on the quick-pass line. Password handling now also covers passwords and tokens written to the console, logs, or error tracking.
 
 ### 1.1.0 — 2026-10-03
 
@@ -108,6 +158,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-commerce
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: card data handling, additional authentication, promotion and trial abuse, pre-purchase information, failed renewals, and disputes.
@@ -120,6 +176,12 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## website-privacy-analytics
 
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
+
 ### 1.1.0 — 2026-10-03
 
 - Added checks: third-party embeds, session replay and heatmaps, browser privacy signals, account deletion, data export, age restrictions.
@@ -130,6 +192,12 @@ Each skill and the prompt it is written from share one version number. The promp
 - Initial release.
 
 ## website-operations
+
+### 1.2.0 — 2026-10-03
+
+- Findings: the full record at every severity, one finding per distinct defect, severity by the harm demonstrated, and no credential values, including test and seed accounts. Summary counts come from the final findings list.
+- Audits at standard and deep depth end with a coverage section naming each check label not verified or not applicable. Runtime probes should change nothing, or use test records and be undone.
+- Re-audits check what each fix changed around it and do not search for unrelated problems.
 
 ### 1.1.0 — 2026-10-03
 

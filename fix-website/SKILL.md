@@ -2,8 +2,8 @@
 name: fix-website
 description: Audit and improve a whole website or prepare it for launch, across UI and accessibility, interactions, content, SEO, performance, backend, security including AI features, payments, privacy, and operations. Use for broad website work, a quick whole-site scan, or a re-audit of saved findings; default to user review before fixes unless audit-and-fix is explicitly requested. Use a focused website-* skill when only one area is in scope.
 metadata:
-  version: "2.0.0"
-  prompt-hash: "fbbca97ed63e"
+  version: "2.1.0"
+  prompt-hash: "4e57c7a97717"
 ---
 
 # Fix Website

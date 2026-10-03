@@ -1,6 +1,6 @@
 # Website Security and Authentication — reusable prompt
 
-Version: 1.1.0
+Version: 1.2.0
 
 Audit and improve this website within the domain below. This prompt is self-contained and requires no installed skill or particular framework/agent. Use the request details below and anything else supplied in this conversation: the repository, URL, goals, constraints, and prior decisions. Ask about consequential missing information.
 
@@ -28,7 +28,7 @@ Use the actual repository, site, and conversation as evidence. The checklist ide
 - **Review first — default:** audit, present findings and proposed fixes, get the user's review, then implement the selected fixes with their corrections and verify them. During the audit, do not change application source, dependency/lock files, configuration, or hosted settings. Non-mutating inspection and existing diagnostic checks with ordinary temporary outputs are appropriate.
 - **Audit and fix — explicit option:** when the user explicitly requests auditing and fixing without an intermediate review, gather evidence and implement unambiguous fixes within the requested scope, then verify and report. This mode does not answer unresolved product questions or authorize unrelated live-system changes.
 - **Audit only — when requested:** report findings and stop. Do not turn an audit request into implementation.
-- **Re-audit — when requested:** when a findings file from an earlier audit exists and the user asks to re-check it, test each recorded finding against the current site and mark it fixed and verified, still open, regressed, or not verified, with the evidence. Do not repeat the whole audit or change application files. Record a new problem met along the way as a new finding.
+- **Re-audit — when requested:** when a findings file from an earlier audit exists and the user asks to re-check it, test each recorded finding against the current site and mark it fixed and verified, still open, regressed, or not verified, with the evidence. Also check what each fix changed around it: a problem the fix introduced is a new finding that names the original ID. Do not repeat the whole audit, search for unrelated problems, or change application files. Record a new problem met along the way as a new finding.
 
 Use the mode requested in the conversation; no exact invocation phrase is required. Honor earlier review decisions and authorization. Do not ask again for approval already given for the same concrete scope. A later instruction to pause or narrow the task takes precedence.
 
@@ -54,15 +54,20 @@ Continue independent inspection while answers are pending. Mark dependent work a
 2. Record a baseline using available builds, tests, runtime observations, screenshots, response headers, traces, or code paths. Distinguish code inference from observed runtime behavior and environmental failures from application bugs.
 3. Exercise applicable normal, empty, loading, invalid, failure, and permission states. For large scopes, state the sampling method and uncovered routes or environments.
 4. Convert demonstrated problems into findings. Classify optional suggestions separately. Mark a domain or check **not applicable** with a reason, or **not verified** with the missing evidence; neither is a pass.
+5. At standard and deep depth, finish by going through the check labels of every selected checklist. Add a coverage section to the report with one line per domain that names each label not verified or not applicable, with the reason; every label not named there counts as audited.
 
-For each actionable finding record:
+Prefer checks that change nothing. When proving a problem needs a write, such as showing that one user can change another user's data, use accounts and records created for the test, or a write that leaves the stored value unchanged. Undo what you create. Do not change other people's accounts, sessions, or data, and list anything you could not undo under Owner actions.
+
+For every finding, whatever its severity, record:
 
 - A stable ID, severity, confidence, and short problem statement.
 - The affected route, file/component, or service; redacted reproduction/evidence and user impact.
 - A concrete proposed change, relevant tradeoffs/dependencies, and observable pass criteria.
 - The user's decision or open question, implementation status, and verification result.
 
-Use critical for demonstrated severe exposure or loss, high for major security/reliability failures or blocked core journeys, medium for meaningful degradation, and low for minor defects. Keep preference-driven improvements optional rather than assigning artificial urgency. Do not print credentials, personal data, reset links, or session tokens in reports.
+A row in a summary table is not a finding by itself; it needs these details too. An item with no proposed change is an open question, not a finding. Give each distinct defect its own finding, even when several share a file or route, and link related findings rather than merging them. Merge only duplicates: the same defect reached from two directions.
+
+Use critical for demonstrated severe exposure or loss, high for major security/reliability failures or blocked core journeys, medium for meaningful degradation, and low for minor defects. Rate each finding by the harm it demonstrates, not by the worst problem near it. Keep preference-driven improvements optional rather than assigning artificial urgency. Do not print credentials, personal data, reset links, or session tokens in reports. This includes test and seed accounts and hardcoded defaults: name where the value is and why it is weak, without the value itself. Take any counts in a summary from the final findings list.
 
 Finding IDs must stay stable across the whole engagement. When the work will continue in a later session, or the user asks, offer to save the findings to `website-audit-findings.md` in a location the user chooses. Writing that file is not an application change, but ask before adding it to the repository, and keep secrets and personal data out of it. When the file already exists, read it first, keep its IDs and decisions, update statuses, and number new findings after the highest existing ID.
 
@@ -120,7 +125,7 @@ End every report with an **Owner actions** list: the things only the owner can d
 
 ## Security, authentication, and prototype leaks
 
-Quick pass: Exposure sweep; Authorization; Row-level security; Data-store and cloud permissions; Injection; Token storage and JWTs.
+Quick pass: Exposure sweep; Authorization; Response contents; Row-level security; Data-store and cloud permissions; Injection; Token storage and JWTs.
 
 Severity examples: critical — an anonymous visitor or any signed-in user can read or change other users' data, or a live privileged credential is exposed; high — injection, stored XSS, or account takeover that needs some precondition; medium — missing hardening such as security headers, rate limits, or enumeration protection; low — version disclosure and minor information leaks.
 
@@ -143,6 +148,7 @@ Map public, authenticated, administrative, tenant-specific, storage, and server-
 
 - **Authorization.** Verify authentication and object/action authorization on the server for every sensitive operation. Test cross-user, cross-tenant, and cross-role access (IDOR/BOLA) with at least two safe fixture accounts, including IDs supplied by the browser. Hidden buttons and client-side role checks are not enforcement.
 - **Field tampering.** Check which fields the server accepts on create and update requests. Client-supplied role, ownership, tenant, price, status, or verification fields must be ignored or authorized, not bound directly to stored records (field tampering/mass assignment). Test by adding or altering such fields with a safe fixture.
+- **Response contents.** Check what each API response, server-rendered page, and serialized record actually contains, not only what the interface displays. Responses should carry only the fields the caller may see: no password hashes, internal costs or margins, staff notes, internal flags, or other users' data. Prefer returning an explicit list of fields over whole records.
 - **Row-level security.** Check tenant boundaries and database row-level security when the architecture relies on it. Do not assume every backend requires RLS or that enabling it alone establishes a complete policy.
 - **Data-store and cloud permissions.** Review effective database, storage, and cloud permissions: open read/write rules, policies that allow every caller, ordinary requests served with owner/superuser or service-role credentials, databases reachable from the public internet, buckets that allow public listing or writing or expose private objects, and permissive access policies or exposed consoles/ports. Apply least privilege to what the application needs, confirm intentionally public assets before restricting them, and do not change live permissions without scope for that action.
 - **Dangling DNS.** Where DNS records are visible, look for subdomains that point at deprovisioned hosting, storage, or SaaS resources another party could claim. Report them; changing DNS needs scope for that action.
@@ -170,7 +176,7 @@ Map public, authenticated, administrative, tenant-specific, storage, and server-
 - **Redirects and enumeration.** Verify safe login/logout redirects and intended-destination preservation without open redirects. Check enumeration risk in visible messages, status codes, and materially observable timing without destructive bulk tests.
 - **Rate limits and tokens.** Review rate limits for login and reset, secure random reset/verification tokens, appropriate expiry and single use, session identifier rotation at login, server-side invalidation at logout, and session invalidation after relevant password/security changes. Redact tokens in logs and artifacts.
 - **Automated abuse.** Check defenses against credential stuffing, signup and form bots, and scripted enumeration: rate limits by account and by source, breached-password checks, lockout or step-up that cannot be used to lock out legitimate users, and monitoring of failed-login spikes. Match controls to observed risk and weigh the accessibility and privacy cost of a CAPTCHA.
-- **Password handling.** Review password handling: storage with a current password-hashing algorithm, never plaintext, reversible encryption, or a fast hash; a server-enforced policy that favors length and rejects common or breached passwords over arbitrary composition rules; and strength feedback that helps users without sending the password to analytics or third parties. A client-side strength meter alone is not enforcement, and changing the policy for existing accounts is a product decision.
+- **Password handling.** Review password handling: storage with a current password-hashing algorithm, never plaintext, reversible encryption, or a fast hash; a server-enforced policy that favors length and rejects common or breached passwords over arbitrary composition rules; and strength feedback that helps users without sending the password to analytics or third parties. A client-side strength meter alone is not enforcement, and changing the policy for existing accounts is a product decision. Check also that neither browser nor server code writes passwords or tokens to the console, logs, or error tracking.
 - **MFA and roles.** Evaluate MFA according to account risk and product requirements; adding a new auth capability needs a product decision. Test role changes, concurrent sessions, multi-tab logout, and sensitive-state cleanup.
 - **OAuth and SSO.** Where third-party sign-in is used, check the `state` parameter and PKCE where the flow calls for them, exact redirect URI matching, token validation of issuer, audience, and expiry, and account linking that cannot attach an attacker's identity to an existing account through an unverified email.
 - **Sensitive changes.** Check that changing the email address, password, MFA settings, or payout details, or deleting the account, requires recent authentication, and that the previous address is notified of email and password changes.

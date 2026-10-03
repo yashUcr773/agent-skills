@@ -168,6 +168,7 @@ Every check in the ten domain checklists, by label and in checklist order. Use i
 - Secret rotation
 - Authorization
 - Field tampering
+- Response contents
 - Row-level security
 - Data-store and cloud permissions
 - Dangling DNS
