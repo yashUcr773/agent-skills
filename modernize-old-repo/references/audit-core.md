@@ -127,6 +127,8 @@ When upgrades are worthwhile, plan them in order: the runtime and toolchain firs
 
 Remove clearly unused dependencies where safe.
 
+To find unused dependencies, search the source and scripts for each package's imports, requires, and command-line use; a package with none is unused. To check classification, flag build, test, and type-checking tools listed as runtime dependencies.
+
 ## Phase 4 — Code quality audit
 
 Review the codebase for:

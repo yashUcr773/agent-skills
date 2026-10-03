@@ -1,6 +1,6 @@
 # Modernize Old Repo — reusable prompt
 
-Version: 2.0.0
+Version: 2.1.0
 
 Perform a complete modernization and maintenance audit of an old software repository: a test, hobby, experimental, or personal project that has not been actively opened or maintained for a long time. This prompt is self-contained, framework agnostic, and agent agnostic. Use the repository, goals, and constraints supplied in this conversation, and ask about consequential missing information instead of guessing.
 
@@ -61,9 +61,11 @@ Use the mode requested in the conversation; no exact phrase is required. A later
 
 ## Record findings
 
-Give each finding a stable ID (`MOD-001`, `MOD-002`, and so on), a severity, the file or location, why it matters, the recommended fix, a rough effort estimate, and its status.
+Give each finding a stable ID (`MOD-001`, `MOD-002`, and so on), a severity, the file or location, why it matters, the recommended fix, a rough effort estimate, and its status. This applies to every finding, including dependency, testing, and documentation problems. An item with no recommended fix is an open question, not a finding. Give distinct problems their own findings, even when they share a file.
 
-Use one severity scale throughout: **critical** for demonstrated severe exposure or loss, **high** for major security or reliability failures or a project that cannot run, **medium** for meaningful degradation, and **low** for minor defects. Mark preference-driven improvements **optional** instead of assigning them a severity.
+Use one severity scale throughout: **critical** for demonstrated severe exposure or loss, **high** for major security or reliability failures or a project that cannot run, **medium** for meaningful degradation, and **low** for minor defects. Mark preference-driven improvements **optional** instead of assigning them a severity. Rate each finding by the harm it demonstrates, not by the worst problem near it. Rate documentation by its effect: a README that describes a different stack, different commands, or guarantees the code does not keep stops a newcomer from running or trusting the project, and is high.
+
+Do not quote credentials in findings, including test, seed, and default ones, or any part of a value such as its first characters. Name where the value is and why it is weak.
 
 If I ask, or the work will continue in a later session, save the findings to a file I name so the IDs persist. Ask before adding that file to the repository, and keep secrets out of it.
 
@@ -191,6 +193,8 @@ Avoid unnecessary major-version upgrades if they provide little value.
 When upgrades are worthwhile, plan them in order: the runtime and toolchain first, then build and test tooling, then frameworks one major version at a time, then the remaining dependencies. Verify between steps so a failure points to one change.
 
 Remove clearly unused dependencies where safe.
+
+To find unused dependencies, search the source and scripts for each package's imports, requires, and command-line use; a package with none is unused. To check classification, flag build, test, and type-checking tools listed as runtime dependencies.
 
 ## Phase 4 — Code quality audit
 
@@ -739,7 +743,7 @@ Group by:
 - Infrastructure
 - Repository hygiene
 
-For every important issue include:
+For every issue include:
 
 - Finding ID and severity
 - Problem
@@ -747,6 +751,8 @@ For every important issue include:
 - File/location
 - Recommended fix
 - Whether you fixed it
+
+Dependency and test problems are findings and belong here with IDs. The Dependencies and Tests sections below report changes made and test results only.
 
 ### Changes made
 

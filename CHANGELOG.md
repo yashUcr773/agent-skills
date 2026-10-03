@@ -230,6 +230,11 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## modernize-old-repo
 
+### 2.1.0 — 2026-10-03
+
+- Every finding gets an ID and severity, including dependency, testing, and documentation problems. An item with no recommended fix is an open question.
+- Added a severity example for a misleading README, a method for finding unused and misclassified dependencies, and a rule against quoting any part of a credential.
+
 ### 2.0.0 — 2026-10-03
 
 - Changed the default to review first: the audit is presented and the user selects changes before any edit. Audit-and-fix and audit-only are available on request.

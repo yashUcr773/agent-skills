@@ -2,8 +2,8 @@
 name: modernize-old-repo
 description: Audit and carefully modernize old, stale, hobby, experimental, or personal software repositories without blindly rewriting them. Use to check whether a neglected project still installs, runs, and is safe to keep, covering dependencies, end-of-life runtimes, security, tests, and documentation; review findings before changes unless audit-and-fix is explicitly requested.
 metadata:
-  version: "2.0.0"
-  prompt-hash: "080c27ff5db9"
+  version: "2.1.0"
+  prompt-hash: "61be4667a1ec"
 ---
 
 # Modernize Old Repo
@@ -59,9 +59,11 @@ Use the mode requested in the conversation; no exact phrase is required. A later
 
 ## Record findings
 
-Give each finding a stable ID (`MOD-001`, `MOD-002`, and so on), a severity, the file or location, why it matters, the recommended fix, a rough effort estimate, and its status.
+Give each finding a stable ID (`MOD-001`, `MOD-002`, and so on), a severity, the file or location, why it matters, the recommended fix, a rough effort estimate, and its status. This applies to every finding, including dependency, testing, and documentation problems. An item with no recommended fix is an open question, not a finding. Give distinct problems their own findings, even when they share a file.
 
-Use one severity scale throughout: **critical** for demonstrated severe exposure or loss, **high** for major security or reliability failures or a project that cannot run, **medium** for meaningful degradation, and **low** for minor defects. Mark preference-driven improvements **optional** instead of assigning them a severity.
+Use one severity scale throughout: **critical** for demonstrated severe exposure or loss, **high** for major security or reliability failures or a project that cannot run, **medium** for meaningful degradation, and **low** for minor defects. Mark preference-driven improvements **optional** instead of assigning them a severity. Rate each finding by the harm it demonstrates, not by the worst problem near it. Rate documentation by its effect: a README that describes a different stack, different commands, or guarantees the code does not keep stops a newcomer from running or trusting the project, and is high.
+
+Do not quote credentials in findings, including test, seed, and default ones, or any part of a value such as its first characters. Name where the value is and why it is weak.
 
 If the user asks, or the work will continue in a later session, save the findings to a file they name so the IDs persist. Ask before adding that file to the repository, and keep secrets out of it.
 

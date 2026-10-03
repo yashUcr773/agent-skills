@@ -105,7 +105,7 @@ Group by:
 - Infrastructure
 - Repository hygiene
 
-For every important issue include:
+For every issue include:
 
 - Finding ID and severity
 - Problem
@@ -113,6 +113,8 @@ For every important issue include:
 - File/location
 - Recommended fix
 - Whether you fixed it
+
+Dependency and test problems are findings and belong here with IDs. The Dependencies and Tests sections below report changes made and test results only.
 
 ### Changes made
 
