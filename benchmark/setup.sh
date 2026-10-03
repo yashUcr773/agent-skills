@@ -8,6 +8,9 @@
 #   benchmark/setup.sh <target-dir> --reaudit       # plus the owner's partial fixes (committed)
 #                                                   # and the earlier findings file
 #   benchmark/setup.sh <target-dir> --stack         # the Next.js, Supabase, and Firebase site instead
+#
+# Set PORT to give a copy of the shop its own port, so several copies can run side by side:
+#   PORT=4101 benchmark/setup.sh <target-dir>
 set -e
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -44,6 +47,12 @@ mkdir -p "$target"
 cp -R "$here/site/." "$target/"
 cd "$target"
 rm -rf node_modules dist data package-lock.json
+
+if [ -n "$PORT" ] && [ "$PORT" != "4000" ]; then
+  for file in server/index.js src/api.js .env; do
+    sed "s/4000/$PORT/g" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+  done
+fi
 
 git init -q
 commit "Fernway Plants shop"
