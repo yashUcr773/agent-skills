@@ -4,6 +4,63 @@ Add one row per run, newest first, using the score produced with `score-run.md`.
 
 In the Found column, partly found defects are counted separately: "85 of 95 (7 partly)" means 85 found, 7 partly found, and the rest missed.
 
+## 2026-10-04: second run, after the fixes
+
+The same 21 runs, again with Sonnet 5.5, after the changes the first run prompted:
+
+- **Skills:** fix-website 2.1.0, the website-* skills 1.2.0, review-changes 1.2.0, and modernize-old-repo 2.1.0.
+- **Fixtures:** eight subtle defects added (`B-SUB-01` to `08`), scored separately so the first run stays comparable.
+- **Scoring:** the stricter `score-run.md`. Quoting any credential now fails the secrets check, and two behavior checks were added: runtime probes, and the coverage section.
+- **Run setup:**
+  - Every agent, skill or control, was told to confirm problems with one harmless request and not to write exploit scripts.
+  - The shared stack data was reset between the two stack runs.
+
+| Comparison | With the skill | Control, no skill | First run (skill / control) |
+| --- | --- | --- | --- |
+| Whole site (r01, r03) | 90 of 95, 37 of 37 critical and high, subtle 5 of 5, 0 false positives | 79 of 95, 36 of 37, subtle 5 of 5, 0 false positives | 85 / 82 |
+| Bad change (r14, r16) | 9 of 10, 0 false positives | 9 of 10, 1 false positive | 10 / 9 |
+| Clean change (r15) | 1 of 3 outcomes, 1 false positive | not run | 2 of 3 |
+| Stack site, security rows (r20, r21) | 13 of 14 (1 partly), subtle 3 of 3 | 13 of 14, subtle 3 of 3 | 14 / 13 |
+| Old repository (r17, r18) | 27 of 29 (B-MOD 8 of 10, B-SEC 19 of 19) | 26 of 29 (B-MOD 8 of 10, B-SEC 18 of 19) | 19 / blocked |
+| Re-audit (r19) | 8 of 8, and the fix's side effect raised as a new finding | not run | 8 of 8, side effect missed |
+
+What changed:
+
+- **Report quality improved most.** The complete-findings check failed in 4 of the 14 skill audits, down from 10 of 14 (now r01, r02, r05, r17). Secrets were kept out in 12 of 14 skill audits; r01 and r11 still quoted the hardcoded JWT fallback. All four controls failed the secrets check. Every website skill at standard depth produced the new coverage section.
+- **Runtime probes are fixed.** The stack security run left the shared data as it found it and listed what it touched. In the first run it left probe data and changed a member's role.
+- **Focused skills found nearly everything in their own area.** Nine of ten found every planted defect in their section, including the two that missed one last time: backend-reliability 10 of 10 and security-auth 19 of 19. Operations dropped from 6 of 6 to 4 of 6, with 2 partly found: two sub-items (the server ignoring `.env`, the missing lock file) went unmentioned. They also found every subtle defect that names their area.
+- **modernize-old-repo improved the most:** 27 of 29, up from 19. It now finds every security defect and gives dependency and test problems IDs. The control, which was not blocked this time, found 26.
+- **The subtle defects did not separate skill from control.** Both the whole-site control and the stack control found every one. On this fixture the skills' advantage shows in breadth (fix-website 90 against 79), in report quality, and in focused depth, not in catching hard defects.
+- **The clean-change review got worse.** With the new plain verdict, r15 committed to "the change introduces a low-severity defect": the newly disabled button has no disabled styling. The key counts any defect named in the changed lines as a false positive. The styling gap is real, so either the key should accept it as an optional suggestion, or the skill should say that polish on correct changed lines is a suggestion, not a defect.
+- **Skills cost more.**
+  - fix-website used 2.2 times the tokens of its control and took 3.8 times as long: 166k against 76k tokens, 7.7 against 2.0 minutes.
+  - The other skill runs used 1.3 to 1.4 times the tokens of their controls.
+- **One run each is still a small sample.** r14 dismissed the N+1 notes fetch as not change-induced, although the change adds it, and so lost a point it scored last time.
+
+| Date | Skill or prompt | Version | Model | Mode, depth | Fixture | Found | Subtle found | Critical and high found | False positives | Questions asked | Behavior | Tokens | Minutes | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-04 | no skill (control) | — | Sonnet 5.5 | audit only | stack site | 15 of 17 (1 partly) | 3 of 3 | 10 of 11 | 0 | not applicable | 3 of 5 | 61k | 1.7 | r21. Security rows 13 of 14; missed B-STACK-05. Quoted the seeded admin password. |
+| 2026-10-04 | website-security-auth | 1.2.0 | Sonnet 5.5 | audit only, standard | stack site | 13 of 14 (1 partly) | 3 of 3 | 10 of 11 | 0 | not applicable | 6 of 6 | 83k | 3.5 | r20. B-STACK-05 partly: the internal notes seen, but blamed on the middleware. Probes undone and listed. |
+| 2026-10-04 | fix-website | 2.1.0 | Sonnet 5.5 | re-audit, standard | re-audit | 8 of 8 statuses | not applicable | 7 of 7 | 0 | not applicable | 6 of 7 | 88k | 2.6 | r19. Raised the UX-001 side effect as UX-003. SEO-002 has no proposed change. First attempt hit the usage limit and was rerun on a fresh copy. |
+| 2026-10-04 | no skill (control) | — | Sonnet 5.5 | audit only | site | 26 of 29 (2 partly) | not applicable | 16 of 16 | 0 | 1 of 1 | 4 of 5 | 72k | 1.9 | r18, modernize control. B-MOD 8 of 10, B-SEC 18 of 19. Quoted seeded and default credentials. |
+| 2026-10-04 | modernize-old-repo | 2.1.0 | Sonnet 5.5 | audit only, full | site | 27 of 29 (2 partly) | not applicable | 16 of 16 | 0 | 1 of 1 | 4 of 5 | 96k | 3.2 | r17. B-MOD 8 of 10, B-SEC 19 of 19. Seven findings have no proposed change. |
+| 2026-10-04 | no skill (control) | — | Sonnet 5.5 | review only | change 001 | 9 of 10 | not applicable | 6 of 6 | 1 | not applicable | 4 of 5 | 55k | 1.4 | r16. Missed B-REV-08. Quoted the test password. |
+| 2026-10-04 | review-changes | 1.2.0 | Sonnet 5.5 | review only | change 002 | 1 of 3 outcomes | not applicable | not applicable | 1 | not applicable | 5 of 6 | 64k | 1.3 | r15. Called the missing disabled-button styling a change-induced low defect. |
+| 2026-10-04 | review-changes | 1.2.0 | Sonnet 5.5 | review only | change 001 | 9 of 10 | not applicable | 6 of 6 | 0 | not applicable | 5 of 5 | 79k | 2.3 | r14. Saw the N+1 notes fetch but did not report it. No credentials quoted. |
+| 2026-10-04 | website-operations | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 4 of 6 (2 partly) | not applicable | 2 of 3 | 0 | not applicable | 6 of 6 | 73k | 2.4 | r13. Partly: never said the server ignores `.env`, and never flagged the missing lock file. 6 of 6 in the first run. |
+| 2026-10-04 | website-privacy-analytics | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 7 of 7 | not applicable | 4 of 4 | 0 | 1 of 1 | 6 of 6 | 80k | 2.4 | r12. Also found B-SUB-03. |
+| 2026-10-04 | website-commerce | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 9 of 9 | 2 of 2 | 7 of 7 | 0 | 1 of 1 | 5 of 6 | 78k | 2.4 | r11. Quoted the hardcoded JWT fallback. |
+| 2026-10-04 | website-security-auth | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 19 of 19 | 3 of 3 | 13 of 13 | 0 | not applicable | 6 of 6 | 118k | 5.4 | r10. |
+| 2026-10-04 | website-backend-reliability | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 10 of 10 | 1 of 1 | none planted | 0 | not applicable | 6 of 6 | 89k | 5.8 | r09. |
+| 2026-10-04 | website-performance | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 6 of 6 | not applicable | 1 of 1 | 0 | not applicable | 6 of 6 | 82k | 2.6 | r08. |
+| 2026-10-04 | website-seo-discoverability | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 6 of 6 | not applicable | 2 of 2 | 0 | 1 of 1 | 6 of 6 | 72k | 1.8 | r07. |
+| 2026-10-04 | website-content-branding | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 9 of 9 | not applicable | 2 of 2 | 0 | 3 of 3 | 6 of 6 | 86k | 2.6 | r06. |
+| 2026-10-04 | website-interactions | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 11 of 11 | not applicable | 2 of 2 | 0 | not applicable | 5 of 6 | 113k | 6.5 | r05. Many short findings without evidence or a proposed change. Found B-SUB-01, 02, 03, 05 as extras. |
+| 2026-10-04 | website-ui-accessibility | 1.2.0 | Sonnet 5.5 | audit only, standard | site | 12 of 12 | not applicable | 3 of 3 | 0 | not applicable | 5 of 5 | 87k | 3.4 | r04. |
+| 2026-10-04 | no skill (control) | — | Sonnet 5.5 | audit only | site | 79 of 95 (8 partly) | 5 of 5 | 36 of 37 | 0 | 3 of 6 | 3 of 5 | 76k | 2.0 | r03. Quoted seeded passwords and default secrets. |
+| 2026-10-04 | fix-website | 2.1.0 | Sonnet 5.5 | audit only, quick | site | 83 of 95 (9 partly) | 5 of 5 | 37 of 37 | 0 | 6 of 6 | 4 of 5 | 118k | 5.0 | r02. Missed B-REL-01, B-UI-09, B-PERF-06. |
+| 2026-10-04 | fix-website | 2.1.0 | Sonnet 5.5 | audit only, standard | site | 90 of 95 (2 partly) | 5 of 5 | 37 of 37 | 0 | 5 of 6 | 4 of 6 | 166k | 7.7 | r01. Missed B-REL-01, B-CON-05, B-PRIV-07. Quoted the hardcoded JWT fallback. |
+
 ## 2026-10-03: first full run
 
 All runs used Sonnet 5.5. Each agent worked on its own throwaway copy made with `setup.sh` and was allowed to install, build, and run it. A separate agent scored each report with `score-run.md`. The agents could not write files, so each returned its report as text. Scorers were told not to count that against them.
