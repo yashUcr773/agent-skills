@@ -9,6 +9,8 @@ import CheckoutSuccess from './pages/CheckoutSuccess.jsx';
 import { Login, Signup } from './pages/Auth.jsx';
 import Account from './pages/Account.jsx';
 import Admin from './pages/Admin.jsx';
+import Settings from './pages/Settings.jsx';
+import Track from './pages/Track.jsx';
 import { About, Contact, Privacy } from './pages/Static.jsx';
 
 function Nav() {
@@ -52,7 +54,7 @@ function Footer() {
       <img src="/logo.svg" alt="" aria-hidden="true" width="60" height="16" />
       <div>© 2019 Plantify Inc. All rights reserved.</div>
       <div>
-        <Link to="/privacy">Privacy</Link> | <Link to="/terms">Terms</Link> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
+        <Link to="/privacy">Privacy</Link> | <Link to="/terms">Terms</Link> | <Link to="/track">Track an order</Link> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
       </div>
       <div>Contact: example@email.com · (555) 555-5555</div>
     </div>
@@ -73,6 +75,8 @@ export default function App() {
         <Route path="/signup" component={Signup} />
         <Route path="/account" component={Account} />
         <Route path="/admin" component={Admin} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/track" component={Track} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/privacy" component={Privacy} />

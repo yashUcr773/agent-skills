@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import moment from 'moment';
+import { api } from '../api.js';
 
 var TESTIMONIALS = [
   { name: 'Jessica M.', avatar: 'https://i.pravatar.cc/600?img=1', text: 'Best plant shop ever! My whole office is green now.' },
@@ -13,11 +14,18 @@ export default function Home() {
   var [visitors, setVisitors] = useState(128);
   var [email, setEmail] = useState('');
   var [subscribed, setSubscribed] = useState(false);
+  var [bestsellers, setBestsellers] = useState([]);
 
   useEffect(function () {
     setInterval(function () {
       setVisitors(_.random(100, 160));
     }, 100);
+  }, []);
+
+  useEffect(function () {
+    api('/products/bestsellers').then(function (data) {
+      if (Array.isArray(data)) setBestsellers(data);
+    });
   }, []);
 
   function subscribe(event) {
@@ -43,6 +51,18 @@ export default function Home() {
         <div>10,000+ happy customers</div>
         <div>4.9/5 from 2,300 reviews</div>
         <div>{visitors} people are shopping right now</div>
+      </div>
+
+      <div className="title">Bestsellers</div>
+      <div className="testimonials">
+        {bestsellers.map(function (product) {
+          return (
+            <Link className="card" key={product.id} to={'/products/' + product.id}>
+              <div>{product.name}</div>
+              <div className="muted">${product.price}</div>
+            </Link>
+          );
+        })}
       </div>
 
       <div className="title">Why Plantify?</div>

@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase-browser';
 import { addNote, deleteNote } from './actions';
+import { completeReminder, snoozeReminder } from './reminder-actions';
 
 export default function Notes() {
   const [user, setUser] = useState(null);
   const [notes, setNotes] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [photo, setPhoto] = useState('');
+  const [kitMessage, setKitMessage] = useState('');
 
   async function load() {
     const { data: auth } = await supabase.auth.getUser();
@@ -32,6 +34,16 @@ export default function Notes() {
   async function remove(id) {
     await deleteNote(id);
     load();
+  }
+
+  async function claimKit(formData) {
+    const response = await fetch('/api/kit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: formData.get('address') }),
+    });
+    const result = await response.json();
+    setKitMessage(result.error || 'Your care kit is on its way.');
   }
 
   async function upload(event) {
@@ -70,10 +82,22 @@ export default function Notes() {
       <ul>
         {reminders.map((reminder) => (
           <li key={reminder.id}>
-            {reminder.plant} on {reminder.due_on}
+            {reminder.plant} on {reminder.due_on}{' '}
+            <button onClick={async () => { await snoozeReminder(reminder.id); load(); }}>Snooze a week</button>{' '}
+            <button onClick={async () => { await completeReminder(reminder.id); load(); }}>Done</button>
           </li>
         ))}
       </ul>
+
+      <h2>Free care kit</h2>
+      <form action={claimKit}>
+        <label>
+          Delivery address
+          <input name="address" required />
+        </label>
+        <button type="submit">Claim my kit</button>
+      </form>
+      {kitMessage ? <p>{kitMessage}</p> : null}
 
       <h2>Plant photo</h2>
       <label>

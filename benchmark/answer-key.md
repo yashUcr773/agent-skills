@@ -225,6 +225,23 @@ Decoys in the stack site:
 | B-DECOY-08 | `lib/firebase.js` | The Firebase web API key and project ID are public by design. |
 | B-DECOY-09 | migration, `reminders` policies | The four policies on `reminders` are correct. The leak is the function in B-STACK-10. |
 
+## Subtle defects
+
+Added after the first benchmark run, which showed that a plain request with no skill finds most of the obvious defects. Each of these looks correct on a first reading: the code checks a session, a parameter, or a count, but the check is incomplete. Score them separately from the sections above so earlier runs stay comparable.
+
+Score a whole-site run (`fix-website` or a control) on the shop against rows 01 to 05, and a run on the stack site against rows 06 to 08. Score a focused skill against the rows whose Area names it.
+
+| ID | Severity | Fixture | Area | Location | Planted defect |
+| --- | --- | --- | --- | --- | --- |
+| B-SUB-01 | high | shop | commerce | `server/store.js` `POST /orders/:id/cancel` | Cancelling checks that the order belongs to the customer but not its state. A paid order can be cancelled with no refund, and every repeated cancel puts the items back in stock again, so stock grows without limit. |
+| B-SUB-02 | high | shop | security | `server/store.js` `POST /account/verify-password` and `POST /account/password`; `src/pages/Settings.jsx` | Re-entering the current password is enforced only by the settings page. The password route accepts any signed-in token without proof that the first step happened, so a stolen token is enough to take over the account. |
+| B-SUB-03 | critical | shop | security | `server/store.js` `GET /track/:id`; `src/pages/Track.jsx` | Order tracking compares the email only when one is sent. Without the parameter, anyone can read the customer's name, address, and order status for any order number. The page always sends the email, so the flaw does not show in the interface. |
+| B-SUB-04 | medium | shop | security | `server/store.js` `GET /products/bestsellers` | The public bestsellers response lists its columns explicitly but includes each product's margin, which reveals cost prices. The home page shows only the name and price. |
+| B-SUB-05 | high | shop | commerce, backend-reliability | `server/store.js` `POST /gift-cards/redeem` | Redemption checks that a code is unused, waits for the issuer check, and only then marks it used. Two requests sent together both pass the check, so one card is credited twice. A second request sent later is correctly refused. |
+| B-SUB-06 | critical | stack site | security | `app/notes/reminder-actions.js` | The reminder actions verify the session, then update and delete by ID with the service-role client and no owner check, so any member can move or delete another member's reminders. The table's own policies are correct (B-DECOY-09); the service role bypasses them. |
+| B-SUB-07 | medium | stack site | security, backend-reliability | `app/api/kit/route.js`, `supabase/migrations/20240301000000_care_kits.sql` | One free kit per member is enforced by a count followed by an insert, with no unique constraint on `kit_claims.user_id`. Two requests sent together both succeed. |
+| B-SUB-08 | critical | stack site | security, performance | `app/summary/page.js` | `unstable_cache` wraps a function that uses the signed-in member but is keyed only by `care-summary`. The first member's email, note count, and next reminder are served to every member for an hour. |
+
 ## Decoys
 
 These look like defects and are not. Reporting one as a finding is a false positive; noting it as checked and acceptable is correct.

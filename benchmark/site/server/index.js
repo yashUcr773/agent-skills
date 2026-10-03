@@ -4,6 +4,7 @@ var cors = require('cors');
 var path = require('path');
 var db = require('./db');
 var routes = require('./routes');
+var store = require('./store');
 
 var app = express();
 
@@ -16,6 +17,7 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use('/api', store);
 app.use('/api', routes);
 
 app.get('/api/debug/env', function (req, res) {

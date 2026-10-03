@@ -38,13 +38,14 @@ function lastId() {
 }
 
 function seed() {
-  db.run('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, role TEXT, address TEXT)');
+  db.run('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, role TEXT, address TEXT, credit REAL NOT NULL DEFAULT 0)');
   db.run('CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, description TEXT, price REAL, cost_price REAL, stock INTEGER, image TEXT)');
   db.run('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total REAL, coupon TEXT, status TEXT, card TEXT, created_at TEXT)');
   db.run('CREATE TABLE order_items (id INTEGER PRIMARY KEY, order_id INTEGER, product_id INTEGER, quantity INTEGER)');
   db.run('CREATE TABLE reviews (id INTEGER PRIMARY KEY, product_id INTEGER, author TEXT, body TEXT)');
   db.run('CREATE TABLE messages (id INTEGER PRIMARY KEY, email TEXT, body TEXT)');
   db.run('CREATE TABLE reset_tokens (id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT)');
+  db.run('CREATE TABLE gift_cards (id INTEGER PRIMARY KEY, code TEXT, amount REAL, redeemed_by INTEGER)');
 
   db.run("INSERT INTO users (email, password_hash, name, role, address) VALUES ('admin@fernway.test', '" + hash('admin123') + "', 'Admin', 'admin', '1 Garden Lane')");
   db.run("INSERT INTO users (email, password_hash, name, role, address) VALUES ('maya@example.test', '" + hash('password1') + "', 'Maya Ortiz', 'customer', '22 Birch Road')");
@@ -73,6 +74,9 @@ function seed() {
 
   db.run("INSERT INTO reviews (product_id, author, body) VALUES (1, 'Sam', 'Arrived healthy and <b>huge</b>!')");
   db.run("INSERT INTO reviews (product_id, author, body) VALUES (2, 'Priya', 'Still alive after three months of forgetting it.')");
+
+  db.run("INSERT INTO gift_cards (code, amount) VALUES ('FERN-2Q7X', 25)");
+  db.run("INSERT INTO gift_cards (code, amount) VALUES ('FERN-8KD3', 50)");
 }
 
 function init() {

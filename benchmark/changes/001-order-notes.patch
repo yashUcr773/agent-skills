@@ -11,19 +11,19 @@ index 59ee51c..9013dbe 100644
      "moment": "2.24.0",
      "react": "17.0.2",
 diff --git a/server/db.js b/server/db.js
-index 6b1f15c..7cd57d8 100644
+index 81147ae..193a4d5 100644
 --- a/server/db.js
 +++ b/server/db.js
 @@ -40,7 +40,7 @@ function lastId() {
  function seed() {
-   db.run('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, role TEXT, address TEXT)');
+   db.run('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, role TEXT, address TEXT, credit REAL NOT NULL DEFAULT 0)');
    db.run('CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, description TEXT, price REAL, cost_price REAL, stock INTEGER, image TEXT)');
 -  db.run('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total REAL, coupon TEXT, status TEXT, card TEXT, created_at TEXT)');
 +  db.run('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, total REAL, coupon TEXT, status TEXT, card TEXT, created_at TEXT, notes TEXT)');
    db.run('CREATE TABLE order_items (id INTEGER PRIMARY KEY, order_id INTEGER, product_id INTEGER, quantity INTEGER)');
    db.run('CREATE TABLE reviews (id INTEGER PRIMARY KEY, product_id INTEGER, author TEXT, body TEXT)');
    db.run('CREATE TABLE messages (id INTEGER PRIMARY KEY, email TEXT, body TEXT)');
-@@ -79,6 +79,7 @@ function init() {
+@@ -83,6 +83,7 @@ function init() {
    return initSqlJs().then(function (SQL) {
      if (fs.existsSync(DB_FILE)) {
        db = new SQL.Database(new Buffer(fs.readFileSync(DB_FILE)));
@@ -69,11 +69,11 @@ index 2067c40..a322450 100644
    var orderId = db.lastId();
    req.body.items.forEach(function (item) {
 diff --git a/src/pages/Account.jsx b/src/pages/Account.jsx
-index 6a93dc4..c1c91fc 100644
+index a3ab77e..5b8871a 100644
 --- a/src/pages/Account.jsx
 +++ b/src/pages/Account.jsx
-@@ -1,6 +1,32 @@
- import React, { useEffect, useState } from 'react';
+@@ -2,6 +2,32 @@ import React, { useEffect, useState } from 'react';
+ import { Link } from 'react-router-dom';
  import { api, getUser, saveSession } from '../api.js';
  
 +// test login: maya@example.test / password1
@@ -105,7 +105,7 @@ index 6a93dc4..c1c91fc 100644
  export default function Account() {
    var user = getUser();
    var [orders, setOrders] = useState([]);
-@@ -43,6 +69,7 @@ export default function Account() {
+@@ -54,6 +80,7 @@ export default function Account() {
                  return <li key={item.id}>{item.quantity} × {item.product.name}</li>;
                })}
              </ul>

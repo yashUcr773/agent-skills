@@ -28,10 +28,10 @@ index bcaf7f1..6fd4fea 100644
 +
 +module.exports = { sign: sign, requireUser: requireUser, requireAdmin: requireAdmin };
 diff --git a/server/index.js b/server/index.js
-index 9100090..f93830f 100644
+index f3ed2a5..2d62da6 100644
 --- a/server/index.js
 +++ b/server/index.js
-@@ -31,6 +31,10 @@ app.post('/api/webhooks/payment', function (req, res) {
+@@ -33,6 +33,10 @@ app.post('/api/webhooks/payment', function (req, res) {
  app.use(express.static(path.join(__dirname, '..', 'dist')));
  app.use(express.static(path.join(__dirname, '..')));
  

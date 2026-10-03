@@ -74,6 +74,8 @@ Notes on the environment:
 | Site: `B-MOD` | 10 | 3 |
 | Change 001: `B-REV` | 10 | 6 |
 | Stack site: `B-STACK` | 17 | 11 |
+| Shop: `B-SUB-01` to `05` | 5 | 4 |
+| Stack site: `B-SUB-06` to `08` | 3 | 2 |
 | Decoys | 9 | not applicable |
 | Questions | 6 | not applicable |
 | Re-audit findings | 8 | not applicable |

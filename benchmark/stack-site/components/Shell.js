@@ -27,6 +27,7 @@ export default function Shell({ children }) {
         <Link href="/">Fernway Care Club</Link>
         <Link href="/tips">Tips ({tipCount})</Link>
         <Link href="/notes">My notes</Link>
+        <Link href="/summary">My summary</Link>
         <Link href="/admin">Admin</Link>
         {email ? <button onClick={logout}>Log out {email}</button> : <Link href="/login">Log in</Link>}
       </nav>
