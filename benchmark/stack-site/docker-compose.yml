@@ -1,0 +1,9 @@
+services:
+  firebase:
+    build: ./firebase
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./firebase.json:/workspace/firebase.json:ro
+      - ./firestore.rules:/workspace/firestore.rules:ro
+      - ./.firebaserc:/workspace/.firebaserc:ro

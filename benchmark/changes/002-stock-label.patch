@@ -1,0 +1,17 @@
+diff --git a/src/pages/ProductDetail.jsx b/src/pages/ProductDetail.jsx
+index f88176c..5b13604 100644
+--- a/src/pages/ProductDetail.jsx
++++ b/src/pages/ProductDetail.jsx
+@@ -34,8 +34,10 @@ export default function ProductDetail(props) {
+       <div className="title">{product.name}</div>
+       <div className="title">${product.price}</div>
+       <p>{product.description}</p>
+-      <div className="muted">{product.stock === 0 ? 'In stock' : product.stock + ' left'}</div>
+-      <button className="btn" onClick={addToCart}>Add to cart</button>
++      <div className="muted">{product.stock > 0 ? product.stock + ' left' : 'Out of stock'}</div>
++      <button className="btn" onClick={addToCart} disabled={product.stock <= 0}>
++        {product.stock > 0 ? 'Add to cart' : 'Out of stock'}
++      </button>
+ 
+       <div className="title">Reviews</div>
+       {product.reviews.map(function (review) {

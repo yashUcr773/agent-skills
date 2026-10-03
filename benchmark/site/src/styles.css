@@ -1,0 +1,158 @@
+* {
+  outline: none;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: #444;
+}
+
+.container {
+  width: 1200px;
+  margin: 0 auto;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
+
+.nav-item {
+  margin-left: 24px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #9a9a9a;
+  text-decoration: none;
+}
+
+.hero {
+  width: 1200px;
+  height: 480px;
+  object-fit: fill;
+}
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 24px 0 8px;
+}
+
+.muted {
+  color: #c4c4c4;
+}
+
+.cta-row {
+  margin: 16px 0;
+}
+
+.btn {
+  display: inline-block;
+  height: 22px;
+  padding: 0 8px;
+  margin-right: 4px;
+  font-size: 11px;
+  line-height: 22px;
+  color: #fff;
+  background: #8fd3a8;
+  border: 0;
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.stats,
+.testimonials,
+.grid {
+  display: flex;
+  gap: 16px;
+}
+
+.grid {
+  flex-wrap: nowrap;
+}
+
+.card {
+  width: 280px;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 11px;
+}
+
+.card img {
+  width: 256px;
+}
+
+.card-title {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link {
+  color: #8fd3a8;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.product-image {
+  width: 600px;
+}
+
+input,
+textarea {
+  display: block;
+  width: 400px;
+  margin: 6px 0;
+  padding: 6px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+}
+
+.modal {
+  position: fixed;
+  top: 100px;
+  left: 300px;
+  width: 600px;
+  height: 900px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #ccc;
+  z-index: 1;
+}
+
+.modal-close {
+  float: right;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 30px;
+  background: #222;
+  color: #777;
+  z-index: 5;
+}
+
+.cookie-ok {
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.footer {
+  margin-top: 48px;
+  padding: 16px 0;
+  font-size: 9px;
+  color: #c4c4c4;
+}

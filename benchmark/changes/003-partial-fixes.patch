@@ -1,0 +1,98 @@
+diff --git a/index.html b/index.html
+index e7e4aa0..a0e1f94 100644
+--- a/index.html
++++ b/index.html
+@@ -3,7 +3,6 @@
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+-    <meta name="robots" content="noindex, nofollow" />
+     <title>Vite App</title>
+     <link rel="canonical" href="http://localhost:3000/" />
+     <meta property="og:title" content="Vite App" />
+diff --git a/server/auth.js b/server/auth.js
+index bcaf7f1..6fd4fea 100644
+--- a/server/auth.js
++++ b/server/auth.js
+@@ -17,4 +17,11 @@ function requireUser(req, res, next) {
+   }
+ }
+ 
+-module.exports = { sign: sign, requireUser: requireUser };
++function requireAdmin(req, res, next) {
++  requireUser(req, res, function () {
++    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admins only' });
++    next();
++  });
++}
++
++module.exports = { sign: sign, requireUser: requireUser, requireAdmin: requireAdmin };
+diff --git a/server/index.js b/server/index.js
+index f3ed2a5..2d62da6 100644
+--- a/server/index.js
++++ b/server/index.js
+@@ -33,6 +33,10 @@ app.post('/api/webhooks/payment', function (req, res) {
+ app.use(express.static(path.join(__dirname, '..', 'dist')));
+ app.use(express.static(path.join(__dirname, '..')));
+ 
++app.get('*', function (req, res) {
++  res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
++});
++
+ app.use(function (err, req, res, next) {
+   res.status(500).send(err.stack);
+ });
+diff --git a/server/routes.js b/server/routes.js
+index 2067c40..4580146 100644
+--- a/server/routes.js
++++ b/server/routes.js
+@@ -92,15 +92,20 @@ router.get('/orders', auth.requireUser, function (req, res) {
+ 
+ router.get('/orders/:id', auth.requireUser, function (req, res) {
+   var order = db.all('SELECT * FROM orders WHERE id = ?', [req.params.id])[0];
+-  if (!order) return res.json({ error: 'Not found' });
++  if (!order || order.user_id !== req.user.id) return res.status(404).json({ error: 'Not found' });
+   order.items = db.all('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
+   order.customer = db.all('SELECT * FROM users WHERE id = ?', [order.user_id])[0];
+   res.json(order);
+ });
+ 
+ router.post('/orders', auth.requireUser, function (req, res) {
++  var total = 0;
++  req.body.items.forEach(function (item) {
++    var product = db.all('SELECT price FROM products WHERE id = ?', [item.productId])[0];
++    total += product.price * item.quantity;
++  });
+   db.run('INSERT INTO orders (user_id, total, coupon, status, card, created_at) VALUES (?, ?, ?, ?, ?, ?)', [
+-    req.user.id, req.body.total, req.body.coupon, 'pending', req.body.card, new Date().toISOString(),
++    req.user.id, total, req.body.coupon, 'pending', req.body.card, new Date().toISOString(),
+   ]);
+   var orderId = db.lastId();
+   req.body.items.forEach(function (item) {
+@@ -125,11 +130,11 @@ router.post('/shipping-quote', function (req, res) {
+ 
+ // ---------- admin ----------
+ 
+-router.get('/admin/users', function (req, res) {
++router.get('/admin/users', auth.requireAdmin, function (req, res) {
+   res.json(db.all('SELECT * FROM users'));
+ });
+ 
+-router.get('/admin/orders', function (req, res) {
++router.get('/admin/orders', auth.requireAdmin, function (req, res) {
+   res.json(db.all('SELECT * FROM orders'));
+ });
+ 
+diff --git a/src/pages/ProductDetail.jsx b/src/pages/ProductDetail.jsx
+index f88176c..797730b 100644
+--- a/src/pages/ProductDetail.jsx
++++ b/src/pages/ProductDetail.jsx
+@@ -42,7 +42,7 @@ export default function ProductDetail(props) {
+         return (
+           <div className="card" key={review.id}>
+             <b>{review.author}</b>
+-            <div dangerouslySetInnerHTML={{ __html: review.body }} />
++            <div>{review.body}</div>
+           </div>
+         );
+       })}
