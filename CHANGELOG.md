@@ -2,6 +2,14 @@
 
 Each skill and the prompt it is written from share one version number. The prompt's `Version:` line is the source; the skill's `metadata.version` must match it, and the skill's `metadata.prompt-hash` records which state of the prompt it was last updated from. Versions follow the usual three-part scheme: the first number changes when something is removed, renamed, or a default changes; the second when checks or options are added; the third for wording fixes.
 
+## start-here
+
+### 1.0.0 — 2026-10-04
+
+- Initial release: a router that interviews the user, proposes a plan of skills, installs missing ones only after asking, and runs them in order.
+- Includes a curated catalog of this collection's skills and external skills for interface design, design references, motion, development workflow, code quality, security testing, and codebase visualization, with each source's license and install command.
+- Lists overlapping skills so the user chooses between them each time.
+
 ## fix-website
 
 ### 2.1.0 — 2026-10-03
