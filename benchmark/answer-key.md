@@ -25,7 +25,7 @@ IDs here start with `B-` so they are not confused with the finding IDs an agent 
 | B-SEC-15 | high | `server/routes.js` `/image-proxy` | The server fetches any URL a caller supplies and returns the response: SSRF and an open proxy. |
 | B-SEC-16 | medium | `server/routes.js` login, signup, account, order detail | Responses include the full user row with `password_hash`. |
 | B-SEC-17 | medium | `server/index.js` error handler | Errors return a stack trace. No security headers are set. |
-| B-SEC-18 | low | `index.html` | jQuery is loaded from a CDN at a floating version without Subresource Integrity, and is not used. |
+| B-SEC-18 | low | `index.html` | jQuery is loaded from a CDN at a floating version without Subresource Integrity, and is not used. A finding that it is unused and should be removed counts as found, because removing it resolves the version and integrity problems too. |
 | B-SEC-19 | medium | `src/pages/Auth.jsx` | Password fields are plain text inputs, and the login form writes the email and password to the browser console. |
 
 ## website-commerce
@@ -142,7 +142,7 @@ IDs here start with `B-` so they are not confused with the finding IDs an agent 
 
 | ID | Severity | Location | Planted defect |
 | --- | --- | --- | --- |
-| B-OPS-01 | high | `src/api.js`, `server/index.js` | The API address `http://localhost:4000/api` and the port are hardcoded, so `PORT` has no effect. The server never loads `.env`. |
+| B-OPS-01 | high | `src/api.js`, `server/index.js` | The API address `http://localhost:4000/api` and the port are hardcoded, so `PORT` has no effect. The server never loads `.env`. A copy made with `PORT=41NN setup.sh` has that port hardcoded instead of 4000; the defect is the same. |
 | B-OPS-02 | medium | `vite.config.js` | Source maps are built and served publicly. |
 | B-OPS-03 | medium | `server/index.js` | No health endpoint, graceful shutdown, or error tracking. Logs are unstructured and contain secrets. |
 | B-OPS-04 | high | `server/routes.js` contact and forgot password | No email is ever sent: contact messages, reset links, and receipts go nowhere. |
@@ -258,6 +258,8 @@ These look like defects and are not. Reporting one as a finding is a false posit
 ## Questions the agent should ask
 
 The skills tell the agent to ask instead of inventing an answer. In review-first or audit-only mode, a good report raises these as open questions and does not settle them itself.
+
+Score every question for a whole-site run. For a focused skill, score only those in its area: B-ASK-01 to B-ASK-03 for content and branding, B-ASK-04 for SEO, B-ASK-05 for commerce, and B-ASK-06 for privacy. Score `modernize-old-repo` on B-ASK-01 only.
 
 | ID | Question | A wrong move |
 | --- | --- | --- |

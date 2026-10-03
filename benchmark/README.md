@@ -42,15 +42,23 @@ Seeded accounts: `admin@fernway.test` / `admin123`, `maya@example.test` / `passw
 
 The stack site needs Docker; its own `README.md` lists the commands. The first start downloads about 3 GB of Supabase images.
 
+Several stack runs can share one Supabase stack and Firestore emulator, but an agent's probes can change the shared data. Reset it before each run, from a copy of the stack site with the services running:
+
+```bash
+npx supabase db reset      # reapplies the migrations and empties the tables
+npm run seed               # recreates the three members, notes, and reminders
+curl -X DELETE "http://127.0.0.1:8080/emulator/v1/projects/demo-fernway/databases/(default)/documents"
+```
+
 ## Run a skill
 
 Open the copy in your agent and ask for an audit. Use audit-only mode so runs are comparable:
 
 | Skill | Fixture | Request | Scored against |
 | --- | --- | --- | --- |
-| `fix-website` | shop | "Use fix-website in audit-only mode on this repository." Repeat at quick depth to test the quick pass. | Every `B-` section for the shop except `B-MOD` and `B-REV`, plus decoys and questions |
-| A focused `website-*` skill | shop | "Use website-security-auth in audit-only mode on this repository." | That skill's section, plus decoys |
-| `website-security-auth`, `-performance`, `-seo-discoverability`, `-backend-reliability` | stack site | The same request in the stack copy. | `B-STACK`, by the check each row names |
+| `fix-website` | shop | "Use fix-website in audit-only mode on this repository." Repeat at quick depth to test the quick pass. | Every `B-` section for the shop except `B-MOD` and `B-REV`, plus decoys, questions, and `B-SUB-01` to `05` |
+| A focused `website-*` skill | shop | "Use website-security-auth in audit-only mode on this repository." | That skill's section, plus decoys and the `B-SUB` rows whose area names the skill |
+| `website-security-auth`, `-performance`, `-seo-discoverability`, `-backend-reliability` | stack site | The same request in the stack copy. | `B-STACK`, by the check each row names, and `B-SUB-06` to `08` by area |
 | `modernize-old-repo` | shop | "Use modernize-old-repo in audit-only mode on this repository." | `B-MOD`, plus the security section |
 | `review-changes` | shop with change 001 | "Use review-changes on the uncommitted changes," followed by the description in `changes/001-order-notes.md`. | `B-REV` |
 | `review-changes` | shop with change 002 | The same, with the description in `changes/002-stock-label.md`. | "Clean change" |
@@ -60,6 +68,12 @@ Open the copy in your agent and ask for an audit. Use audit-only mode so runs ar
 To test a prompt instead of a skill, paste the prompt from `prompts/` and fill in its request details.
 
 Run the control. Without it there is no way to tell what a skill adds over the model on its own.
+
+Practical notes for running several copies at once:
+
+- Give each shop copy its own port with `PORT=41NN benchmark/setup.sh <dir>`, and ask the agent to stop the processes it starts by their process IDs. A broad `pkill` stops other runs' servers.
+- Ask the agent to confirm a vulnerability with one harmless request and not to write exploit scripts. Some models' safeguards stop a run that builds exploits; the first run's modernize control was stopped this way.
+- Record the tokens and time each run used next to its score, so the cost of a skill can be weighed against what it adds.
 
 ## Score a run
 
@@ -82,6 +96,6 @@ The fixtures are meant to look vulnerable, so automated scanners will react to t
 
 ## Limits
 
-- The defects were planted by hand and are easier to spot than those in a large real codebase. A high score here does not show that a skill is complete.
+- The defects were planted by hand and are easier to spot than those in a large real codebase. A high score here does not show that a skill is complete. The `B-SUB` rows were added because a plain request with no skill found most of the others; they are the better measure of what a skill adds.
 - Several checks cannot be exercised: there is no real payment provider, email service, CDN, or production deployment, and the Stripe, Clerk, Auth.js, Auth0, and Better Auth checks have no fixture.
 - The sites have not been reviewed for defects beyond those planted. Expect an agent to find more.
