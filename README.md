@@ -1,9 +1,10 @@
 # Agent Skills
 
-Reusable, framework-agnostic and agent-agnostic workflows for maintaining repositories and improving websites. This repository contains **13 independently installable skills**, each written from a standalone prompt that can also be pasted into any agent.
+Reusable, framework-agnostic and agent-agnostic workflows for maintaining repositories and improving websites. This repository contains **14 independently installable skills**, each written from a standalone prompt that can also be pasted into any agent.
 
 ## Which skill should I use?
 
+- Use **`start-here`** when you are not sure, or when the work spans several kinds of task. It asks what you want done, proposes a plan of skills, and runs them in order. Besides this collection, it can route to a curated set of external skills for interface design, motion, development workflow, security testing, and codebase visualization. External skills are installed separately, only after it asks, and are maintained by their authors under their own licenses; see its [catalog](start-here/references/catalog.md).
 - Use **`fix-website`** when assessing a whole website, preparing for launch, running a quick whole-site scan, or investigating problems across several areas. It coordinates one combined audit and review.
 - Use a **focused `website-*` skill** when you already know the problem area and want a narrower audit or fix.
 - Use **`review-changes`** when reviewing uncommitted changes, staged changes, a commit, a branch, or a PR for regressions across security, accessibility, performance, correctness, and other affected areas.
@@ -13,6 +14,7 @@ Reusable, framework-agnostic and agent-agnostic workflows for maintaining reposi
 
 | Installable skill | When to use it | Standalone prompt |
 | --- | --- | --- |
+| [start-here](start-here/SKILL.md) | You are not sure which skill fits, or the work spans several kinds of task, and you want to be asked what to do and given a plan of skills before anything runs. | [Prompt](prompts/start-here.md) |
 | [fix-website](fix-website/SKILL.md) | You need a whole-site assessment, a prioritized improvement plan, a quick scan, a re-audit of saved findings, or final pre-launch checks spanning multiple areas. | [Light](prompts/fix-website.md) · [Full](prompts/fix-website-full.md) |
 | [website-ui-accessibility](website-ui-accessibility/SKILL.md) | Pages overflow or overlap, mobile or right-to-left layouts break, styling is inconsistent, or keyboard, screen-reader, zoom, focus, and browser behavior need review. | [Prompt](prompts/website-ui-accessibility.md) |
 | [website-interactions](website-interactions/SKILL.md) | Links, menus, buttons, forms, multi-step flows, deep links, or search fail; loading/error feedback is missing; client state becomes stale or inconsistent. | [Prompt](prompts/website-interactions.md) |
@@ -73,6 +75,7 @@ npx skills add yashUcr773/agent-skills --list
 Choose the command for the skill you want; you do not need to run all of them:
 
 ```bash
+npx skills add yashUcr773/agent-skills --skill start-here
 npx skills add yashUcr773/agent-skills --skill fix-website
 npx skills add yashUcr773/agent-skills --skill review-changes
 npx skills add yashUcr773/agent-skills --skill website-ui-accessibility

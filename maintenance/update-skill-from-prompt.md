@@ -36,7 +36,7 @@ A clean lint is necessary, not sufficient.
 - For the website skills it also checks that the workflow section and the whole checklist section match the prompt, and that the short checklist lists exactly the check labels.
 - For `modernize-old-repo` it checks that every bullet inside a phase survives in the skill.
 - It checks versions, the prompt hash, a changelog heading for the version, links, description format, and spelling.
-- It does not check headings, introductions, paragraphs, tables, or numbered lists in `review-changes` and `modernize-old-repo`, and it cannot tell whether a changelog entry describes the change. Those are yours to compare.
+- It does not check headings, introductions, paragraphs, tables, or numbered lists in `review-changes`, `modernize-old-repo`, and `start-here`, and it cannot tell whether a changelog entry describes the change. Those are yours to compare. For `start-here`, it does check every catalog entry, because each is a labeled bullet.
 
 ## How a skill differs from its prompt
 
@@ -59,6 +59,8 @@ A new section in the prompt goes into `SKILL.md`, in the prompt's order, unless 
 - **`fix-website`.** `SKILL.md` holds the introduction, scoping, the routing table, and the combine and verify sections. The workflow is `references/workflow.md`, each "Checklist: website-…" section is its own reference file with identical text, and the short checklist is `references/short-checklist.md`.
 - **`review-changes`.** `SKILL.md` holds the six numbered sections, including every review dimension that applies to any change. "Website feature checks" and "Checks for other project types" move to `references/project-types.md`: the website block keeps its introduction, and each other project type becomes its own `##` block under a short introduction that replaces the prompt's. In `SKILL.md`, a single `### Project-type checks` pointer is left at the end of section 4, naming the project types and when to read the file.
 - **`modernize-old-repo`.** `SKILL.md` holds the goals, ground rules, modes, depth, safety rules, findings format, and operating principles, with a table of phases. The phases live in references: the core audit, the frontend phase, the backend and database phases, the infrastructure phase, and the implement, verify, and report phases.
+
+- **`start-here`.** `SKILL.md` holds the interview, the rules for choosing skills, the plan, installing, running, finishing, and safety. The prompt's "Catalog" section, meaning the sources table, every entry, and the overlaps table, is `references/catalog.md`, which `SKILL.md` says to read before choosing. The catalog names external skills; when you update it, confirm their install commands and licenses against their repositories, because those change outside this repository.
 
 For a new skill, follow the closest existing one.
 
