@@ -211,6 +211,11 @@ Each skill and the prompt it is written from share one version number. The promp
 
 ## review-changes
 
+### 1.2.0 — 2026-10-03
+
+- The recommendation now says plainly whether the change introduces defects. Pre-existing issues and suggestions are never conditions on the change.
+- Every finding needs the full record at every severity, distinct defects get their own findings, and the report quotes no credentials, including test and seed accounts.
+
 ### 1.1.0 — 2026-10-03
 
 - Added depth scaling by the size and risk of the change, with no reduction on trust boundaries.

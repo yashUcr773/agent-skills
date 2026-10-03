@@ -1,6 +1,6 @@
 # Review Changes — reusable prompt
 
-Version: 1.1.0
+Version: 1.2.0
 
 Perform a thorough, evidence-based review of the changes I identify: current uncommitted changes, staged changes, the last commit, a specified commit/range, a branch, or a pull request. Review correctness, security, accessibility, performance, and every other applicable area below. Follow changed behavior into its callers, consumers, configuration, and user journeys instead of looking only at added lines.
 
@@ -206,11 +206,11 @@ Consult current primary documentation or advisories when a conclusion depends on
 
 ## 6. Report findings and stop at the requested boundary
 
-Lead with actionable findings ordered by impact, using stable IDs such as `REV-001`. Report all substantiated findings without inventing issues to fill a quota or stopping after the first few. Combine duplicate root causes and identify affected consumers rather than counting the same defect repeatedly.
+Lead with actionable findings ordered by impact, using stable IDs such as `REV-001`. Report all substantiated findings without inventing issues to fill a quota or stopping after the first few. Combine duplicate root causes and identify affected consumers rather than counting the same defect repeatedly. Give distinct defects their own findings, even when they share a file, and rate each by the harm it demonstrates.
 
 For a pull request, read the existing review comments and threads first. Do not re-report an issue that is already raised and still open unless you add new evidence; note agreement in one line. Say so when you disagree with an existing comment, or when a thread marked resolved is not actually fixed in the head revision.
 
-For each finding include:
+For every finding, whatever its severity, include all of the following. An item with no proposed correction is an open question, not a finding.
 
 - **ID, severity, category, confidence, and concise title.** Critical means demonstrated severe exposure/loss; high means major security/reliability failures or blocked core journeys; medium means meaningful degradation; low means minor defects. Keep optional suggestions separate.
 - **Location in the reviewed state:** file and precise relevant line(s), route/component/service, or configuration setting. For deletions, identify the removed behavior and diff location without inventing a current line. Prefer a short location explaining the cause and add context links when useful.
@@ -218,13 +218,15 @@ For each finding include:
 - **Impact and attribution:** the consequence and why the change introduces or worsens it, with baseline comparison when available.
 - **Proposed correction and verification:** the smallest appropriate remedy, any required decision, and observable pass criteria or a targeted regression check. Do not implement during review-only work.
 
+Do not quote credentials, tokens, or personal data in the report. This includes test and seed accounts and hardcoded defaults: name where the value is and why it is a problem, without the value itself.
+
 After findings, provide:
 
 1. **Open questions and uncertain risks** that could materially affect the assessment, separated from confirmed defects.
 2. **Scope and coverage:** target and exact revisions/snapshot, intended behavior, reviewed areas, and a compact table of the dimensions above with evidence or reasons for partial/not-verified/not-applicable results. For a small change, a short statement of the dimensions reviewed and those not applicable is enough.
 3. **Verification:** checks actually run and results, baseline/environment failures, and unavailable checks. Identify the tested snapshot if it differs from current state.
 4. **Pre-existing issues and optional suggestions**, only when relevant, explicitly separated from change-induced findings.
-5. **Recommendation:** blocking findings remain, no blocking findings found within the reviewed scope, or insufficient evidence, with the reason. If no actionable findings were found, say so plainly while retaining coverage limits. Avoid blanket claims such as "completely secure" or "everything is tested."
+5. **Recommendation:** one of the following, with the reason: the change introduces defects that should block it; the change introduces defects that need not block it; the change introduces no defect found within the reviewed scope; or the evidence is insufficient. Base it on change-induced findings only. Pre-existing issues and optional suggestions are never conditions on the change. When the change introduces no defect, say so in those words while retaining coverage limits. Avoid blanket claims such as "completely secure" or "everything is tested."
 
 For review-only work, stop after the report and the specific questions needed for the next decision. If I select fixes, follow my choices, retain deferred IDs, verify accepted changes, and report what remains. For explicitly authorized review-and-fix work, report findings, fixes, and post-fix verification separately. Do not submit a PR review or publish changes without an instruction to do so.
 
